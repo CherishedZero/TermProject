@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>815</width>
+    <height>593</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,8 +35,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>791</width>
-        <height>551</height>
+        <width>800</width>
+        <height>525</height>
        </rect>
       </property>
       <property name="autoFillBackground">
@@ -49,211 +49,581 @@
        <attribute name="title">
         <string>New Invoice</string>
        </attribute>
-       <widget class="QComboBox" name="nameComboBoxNewInvoiceTab">
+       <widget class="QGroupBox" name="newInvoiceGroupBox">
         <property name="geometry">
          <rect>
-          <x>70</x>
-          <y>30</y>
-          <width>421</width>
-          <height>22</height>
+          <x>0</x>
+          <y>0</y>
+          <width>800</width>
+          <height>525</height>
          </rect>
         </property>
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-        <property name="currentText">
+        <property name="title">
          <string/>
         </property>
-        <property name="maxVisibleItems">
-         <number>5</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="productComboBoxNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>70</x>
-          <y>110</y>
-          <width>281</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="editable">
-         <bool>false</bool>
-        </property>
-        <property name="currentText">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="emailLineEditNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>70</x>
-          <y>70</y>
-          <width>281</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="nameLabelNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>30</y>
-          <width>47</width>
-          <height>13</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Name</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="emailLabelNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>70</y>
-          <width>47</width>
-          <height>13</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Email</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="idLabelNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>70</y>
-          <width>21</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>ID</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="idLineEditNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>410</x>
-          <y>70</y>
-          <width>81</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="productLabelNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>110</y>
-          <width>47</width>
-          <height>13</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Product</string>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="productNumberSpinBoxNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>70</x>
-          <y>140</y>
-          <width>111</width>
-          <height>22</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="addProductButtonNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>190</x>
-          <y>140</y>
-          <width>161</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Add Product To Invoice</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="removeProductButtonNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>190</x>
-          <y>180</y>
-          <width>161</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Remove Product From Invoice</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="purchaseButtonNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>70</x>
-          <y>220</y>
-          <width>281</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Purchase</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="invoiceTotalLabelNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>440</x>
-          <y>470</y>
-          <width>81</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Invoice Total</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="invoiceTotalLineEditNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>520</x>
-          <y>470</y>
-          <width>261</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QTableWidget" name="invoiceListTableWidgetNewInvoiceTab">
-        <property name="geometry">
-         <rect>
-          <x>520</x>
-          <y>30</y>
-          <width>256</width>
-          <height>421</height>
-         </rect>
-        </property>
+        <widget class="QLabel" name="label_7">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_8">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>70</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Email</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="emailLineEditNewInvoiceTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>70</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="idLineEditNewInvoiceTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>110</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_9">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>110</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>ID</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_10">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>150</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Product</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="purchaseButtonNewInvoiceTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>250</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Purchase</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="nameComboBoxNewInvoiceTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>30</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="productComboBoxNewInvoiceTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>150</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QSpinBox" name="productNumberSpinBoxNewInvoiceTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>190</y>
+           <width>40</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="addProductButtonNewInvoiceTab">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>190</y>
+           <width>200</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Add Product To Invoice</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="removeProductButtonNewInvoiceTab">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>220</y>
+           <width>200</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Remove Product From Invoice</string>
+         </property>
+        </widget>
+        <widget class="QTableWidget" name="invoiceListTableWidgetNewInvoiceTab">
+         <property name="geometry">
+          <rect>
+           <x>390</x>
+           <y>30</y>
+           <width>400</width>
+           <height>400</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_11">
+         <property name="geometry">
+          <rect>
+           <x>310</x>
+           <y>460</y>
+           <width>70</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Invoice Total</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="invoiceTotalLineEditNewInvoiceTab">
+         <property name="geometry">
+          <rect>
+           <x>390</x>
+           <y>460</y>
+           <width>390</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLabel" name="feedbackLabelNewInvoiceTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>310</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
        </widget>
       </widget>
       <widget class="QWidget" name="addCustomerTab">
        <attribute name="title">
         <string>Add Customer</string>
        </attribute>
+       <widget class="QGroupBox" name="addCustomerGroupBox">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>800</width>
+          <height>525</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string/>
+        </property>
+        <widget class="QLabel" name="label">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>First Name</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="firstNameLineEditAddCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>30</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_2">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>70</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Last Name</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lastNameLineEditAddCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>70</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="emailLineEditAddCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>110</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_3">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>110</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Email</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_4">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>150</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Address</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="addressLineEditAddCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>150</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="phoneLineEditAddCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>190</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_5">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>190</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Phone</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_6">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>0</y>
+           <width>230</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: red;</string>
+         </property>
+         <property name="text">
+          <string>*Customer ID will be automatically generated</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="addCustomerButtonAddCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>240</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Add Customer</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="feedbackLabelAddCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>300</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </widget>
       </widget>
       <widget class="QWidget" name="editCustomerTab">
        <attribute name="title">
         <string>Edit Customer</string>
        </attribute>
+       <widget class="QGroupBox" name="addCustomerGroupBox_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>811</width>
+          <height>521</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string/>
+        </property>
+        <widget class="QLabel" name="label_12">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>ID</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_13">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>70</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>First Name</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="firstNameLineEditEditCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>70</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lastNameLineEditEditCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>110</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_14">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>110</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Last Name</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_15">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>150</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Address</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="addressLineEditEditCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>150</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="phoneLineEditEditCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>190</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_16">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>190</y>
+           <width>60</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Phone</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="saveChangesButton">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>240</y>
+           <width>91</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Save Changes</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="feedbackLabelAddCustomerTab_2">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>300</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="idComboBoxEditCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>30</y>
+           <width>260</width>
+           <height>20</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="deleteCustomerButton">
+         <property name="geometry">
+          <rect>
+           <x>260</x>
+           <y>240</y>
+           <width>91</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Delete Customer</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="feedbackLabelEditCustomerTab">
+         <property name="geometry">
+          <rect>
+           <x>100</x>
+           <y>300</y>
+           <width>251</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -271,7 +641,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="addInventoryTab">
        <attribute name="title">
@@ -307,7 +677,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>815</width>
      <height>21</height>
     </rect>
    </property>
