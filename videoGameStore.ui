@@ -43,7 +43,7 @@
        <bool>false</bool>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="newInvoiceTab">
        <attribute name="title">
@@ -238,6 +238,9 @@
          </property>
         </widget>
         <widget class="QLineEdit" name="invoiceTotalLineEditNewInvoiceTab">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="geometry">
           <rect>
            <x>390</x>
@@ -401,7 +404,7 @@
           <rect>
            <x>10</x>
            <y>0</y>
-           <width>230</width>
+           <width>261</width>
            <height>20</height>
           </rect>
          </property>
@@ -483,6 +486,9 @@
          </property>
         </widget>
         <widget class="QLineEdit" name="idNameLineEditEditCustomerTab">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="geometry">
           <rect>
            <x>90</x>
