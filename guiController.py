@@ -32,12 +32,12 @@ class MainWindow(QMainWindow):
         self.purchaseButtonNewInvoiceTab = self.findChild(QPushButton, 'purchasebutton')
         #self.purchaseButtonNewInvoiceTab.clicked.connect(purchaseButtonNewInvoiceTabClickHandler)
         customers = getCustomerNames()
-        games = getProductNames()
+        games = getProducts()
         for row in customers:
             self.nameComboBoxNewInvoiceTab.addItem(row[1], userData=[row[0], row[2]])
         self.nameComboBoxNewInvoiceTab.currentIndexChanged.connect(self.nameComboBoxNewInvoiceTabCurrentIndexChangedHandler)
         for game in games:
-            self.productComboBoxNewInvoiceTab.addItem(str(game))
+            self.productComboBoxNewInvoiceTab.addItem(str(game[1]))
 
 
     def nameComboBoxNewInvoiceTabCurrentIndexChangedHandler(self):
@@ -63,17 +63,19 @@ class MainWindow(QMainWindow):
         for i in range(num_rows, num_rows + len(rows)):
             row = rows[i - num_rows]
             self.items = row
-            for j in range(len(self.items)):
+            for j in range(len(columns)):
                 try:
                     if j == 0:
-                        item = QTableWidgetItem(str(self.items[list(self.items.keys())[j]]))
-                        print(str(self.items[list(self.items.keys())[j]]))
-                        table.setItem(i, j, item)
-                    else:
+                        item = QTableWidgetItem(str(row['prod_id']))
+                    elif j == 1:
+                        item = QTableWidgetItem(row['prod_name'])
+                    elif j == 2:
                         base_price = float(self.items['price'])
                         modified_price = base_price * quantity
-                        total_price = QTableWidgetItem(str(modified_price))
-                        table.setItem(i, j,total_price)
+                        item = QTableWidgetItem(str(modified_price))
+                    elif j == 3:
+                        item = QTableWidgetItem(str(quantity))
+                    table.setItem(i, j, item)
                 except Exception as e:
                     print(f"Error: {e}, row: {i}, column: {j}, value: {self.items[list(self.items.keys())[j]]}")
             for i in range(table.columnCount()):
@@ -81,7 +83,6 @@ class MainWindow(QMainWindow):
 
     def removeProductButtonNewInvoiceTabClickHandler(self):
         selected_row = self.invoiceListTableWidgetNewInvoiceTab.currentRow()
-        print(selected_row)
         if selected_row >= 0:
             self.invoiceListTableWidgetNewInvoiceTab.removeRow(selected_row)
             self.getTotal()
@@ -90,13 +91,13 @@ class MainWindow(QMainWindow):
         total = 0.0
         for row in range(self.invoiceListTableWidgetNewInvoiceTab.rowCount()):
             try:
-                price_cell = self.invoiceListTableWidgetNewInvoiceTab.item(row, 1)
+                price_cell = self.invoiceListTableWidgetNewInvoiceTab.item(row, 2)
                 if price_cell is not None:
                     price = float(price_cell.text())
                     total += price
             except ValueError:
                 pass
-        self.invoiceTotalLineEditNewInvoiceTab.setText("{:.2f}".format(total))
+        self.invoiceTotalLineEditNewInvoiceTab.setText('$' + "{:.2f}".format(total))
 
 
     def addCustomerWidgetSetup(self):
@@ -135,7 +136,7 @@ class MainWindow(QMainWindow):
         self.saveChangesButton.clicked.connect(self.saveChangesButtonClickHandler)
         customers = getCustomer()
         for row in customers:
-            self.nameComboBoxEditCustomerTab.addItem(row[0], userData=[row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
+            self.nameComboBoxEditCustomerTab.addItem(str(row[1]), userData=[row[1], row[0], row[2], row[3], row[4], row[5], row[6]])
         self.nameComboBoxEditCustomerTab.currentIndexChanged.connect(self.idComboBoxEditCustomerTabCurrentIndexChangedHandler)
 
     def idComboBoxEditCustomerTabCurrentIndexChangedHandler(self):
@@ -169,12 +170,12 @@ class MainWindow(QMainWindow):
             phone = self.phoneLineEditEditCustomerTab.text()
             fname = self.firstNameLineEditCustomerTab.text()
             lname = self.lastNameLineEditEditCustomerTab.text()
-            result = updateCustomerInfo(id, email, address, phone, fname, lname)
+            if address != '':
+                updateCustomerInfo(id, email, address, phone, fname, lname)
+            else:
+                updateCustomerInfoBlankAddress(id, email, phone, fname, lname)
         except Exception as e:
             print(e)
-        else:
-            if result > 0:
-                print('cool')
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
