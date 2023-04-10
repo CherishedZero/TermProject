@@ -19,7 +19,7 @@ def getGameInfoByName(name):
             return None
         gameInfo = result_set[0]
         data = {'prod_id': gameInfo[0], 'prod_name': gameInfo[1], 'price': float(gameInfo[2])}
-        return ['ID', 'Game', 'Price($)', 'Quantity'], data
+        return ['ID', 'Game', 'Quantity', 'Price($)'], data
     except Exception as e:
         print(e)
         return None

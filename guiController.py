@@ -3,6 +3,7 @@ import sys
 
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
+from PyQt6.QtCore import Qt
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -16,6 +17,7 @@ class MainWindow(QMainWindow):
         self.addCustomerWidgetSetup()
         self.editCustomerWidgetSetup()
         self.items = {}
+        self.table_key = {}
 
     def newInvoiceWidgetSetup(self):
         self.nameComboBoxNewInvoiceTab = self.findChild(QComboBox, 'nameComboBoxNewInvoiceTab')
@@ -62,27 +64,68 @@ class MainWindow(QMainWindow):
         quantity = self.productNumberSpinBoxNewInvoiceTab.value()
         for i in range(num_rows, num_rows + len(rows)):
             row = rows[i - num_rows]
+            keys = list(row.keys())
+            values = list(row.values())
+            item_key = values[0]
+            item_info = {keys[1]: values[1], keys[2]: values[2]}
+            # print(item_key)
             self.items = row
-            for j in range(len(columns)):
-                try:
-                    if j == 0:
-                        item = QTableWidgetItem(str(row['prod_id']))
-                    elif j == 1:
-                        item = QTableWidgetItem(row['prod_name'])
-                    elif j == 2:
-                        base_price = float(self.items['price'])
-                        modified_price = base_price * quantity
-                        item = QTableWidgetItem(str(modified_price))
-                    elif j == 3:
-                        item = QTableWidgetItem(str(quantity))
-                    table.setItem(i, j, item)
-                except Exception as e:
-                    print(f"Error: {e}, row: {i}, column: {j}, value: {self.items[list(self.items.keys())[j]]}")
-            for i in range(table.columnCount()):
-                table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
+            row_index = -1
+            if item_key in self.table_key:
+                self.table_key[item_key]['quantity'] += quantity
+                # print(self.table_key[item_key]['quantity'])
+                current_price = self.table_key[item_key]['price']
+                updated_price = current_price * self.table_key[item_key]['quantity']
+                print(updated_price)
+                matching_items = table.findItems(str(item_key), Qt.MatchFlag.MatchContains)
+                if matching_items:
+                    matching_item = matching_items[0]
+                    row_index = matching_item.row()
+                    current_quantity = int(table.item(row_index, 2).text())
+                    print(current_quantity)
+                    new_quantity = quantity + current_quantity
+                    # print(new_quantity)
+                    table.item(row_index, 2).setText(str(new_quantity))
+                table.item(row_index, 3).setText(str(updated_price))
+            else:
+                self.table_key[item_key] = {'prod_name': item_info['prod_name'],
+                                            'price': item_info['price'],
+                                            'quantity': quantity}
+                for j in range(len(columns)):
+                    try:
+                        if j == 0:
+                            matching_items = table.findItems(str(item_key), Qt.MatchFlag.MatchContains)
+                            if matching_items:
+                                matching_item = matching_items[0]
+                                row_index = matching_item.row()
+                                # print(row_index)
+                                current_quantity = int(table.item(row_index, 2).text())
+                                print(current_quantity)
+                                new_quantity = quantity + current_quantity
+                                # print(new_quantity)
+                                table.item(row_index, 2).setText(str(new_quantity))
+                            else:
+                                item = QTableWidgetItem(str(row['prod_id']))
+                            # print(item.text())
+                        elif j == 1:
+                            item = QTableWidgetItem(row['prod_name'])
+                        elif j == 2:
+                            item = QTableWidgetItem(str(quantity))
+                        elif j == 3:
+                            base_price = float(self.items['price'])
+                            modified_price = base_price * quantity
+                            item = QTableWidgetItem(str(modified_price))
+                        table.setItem(i, j, item)
+                    except Exception as e:
+                        print(f"Error: {e}, row: {i}, column: {j}, value: {self.items[list(self.items.keys())[j]]}")
+        for i in range(table.columnCount()):
+            table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
     def removeProductButtonNewInvoiceTabClickHandler(self):
         selected_row = self.invoiceListTableWidgetNewInvoiceTab.currentRow()
+        print(table.item(selected_row, 0).text())
+        print(self.table_key)
+        #if dict.keys()
         if selected_row >= 0:
             self.invoiceListTableWidgetNewInvoiceTab.removeRow(selected_row)
             self.getTotal()
@@ -91,7 +134,7 @@ class MainWindow(QMainWindow):
         total = 0.0
         for row in range(self.invoiceListTableWidgetNewInvoiceTab.rowCount()):
             try:
-                price_cell = self.invoiceListTableWidgetNewInvoiceTab.item(row, 2)
+                price_cell = self.invoiceListTableWidgetNewInvoiceTab.item(row, 3)
                 if price_cell is not None:
                     price = float(price_cell.text())
                     total += price
