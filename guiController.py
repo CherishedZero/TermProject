@@ -139,8 +139,7 @@ class MainWindow(QMainWindow):
                 if price_cell is not None and quantity_cell is not None:
                     price = float(price_cell.text())
                     quantity = int(quantity_cell.text())
-                    base_price = price / quantity
-                    total = base_price * quantity
+                    total += price
             except ValueError:
                 pass
         self.invoiceTotalLineEditNewInvoiceTab.setText('$' + "{:.2f}".format(total))
