@@ -116,15 +116,15 @@ VALUES (5, 5, 1);
 
 -- Creating Stored Procedures for ComboBoxes
 DELIMITER //
-CREATE PROCEDURE `prod_invoice_by_id` (IN product_id INT)
+CREATE PROCEDURE `prod_invoice` ()
 BEGIN
-	SELECT prod_id, prod_name, price FROM products WHERE prod_id = product_id;
+	SELECT prod_id, prod_name, price FROM products;
 END
 //
 DELIMITER //
-CREATE PROCEDURE `prod_full_info_by_id` (IN product_id INT)
+CREATE PROCEDURE `prod_full_info` ()
 BEGIN
-	SELECT prod_id, prod_name, genre, developer, release_date, price, inventory, vendor_id FROM products WHERE prod_id = product_id;
+	SELECT prod_id, prod_name, genre, developer, release_date, price, inventory, vendor_id FROM products;
 END
 //
 DELIMITER //
@@ -134,15 +134,15 @@ BEGIN
 END
 //
 DELIMITER //
-CREATE PROCEDURE `customer_info_invoice_by_id` (IN id INT)
+CREATE PROCEDURE `customer_info_invoice` ()
 BEGIN
-	SELECT customer_id, CONCAT(first_name, ' ', last_name), email FROM customers WHERE customer_id = id;
+	SELECT customer_id, CONCAT(first_name, ' ', last_name), email FROM customers;
 END
 //
 DELIMITER //
-CREATE PROCEDURE `customer_full_info_by_id` (IN id INT)
+CREATE PROCEDURE `customer_full_info` ()
 BEGIN
-	SELECT customer_id, first_name, last_name, email, address, phone FROM customers WHERE customer_id = id;
+	SELECT customer_id, CONCAT(first_name, ' ', last_name), first_name, last_name, email, address, phone FROM customers;
 END
 //
 
