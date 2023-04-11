@@ -1,7 +1,7 @@
 from testingmysql_func import *
 
 def getCustomerNames():
-    sql = f"SELECT customer_id, CONCAT(first_name, ' ', last_name), email FROM customers;"
+    sql = f"CALL `store`.`customer_info_invoice`();"
     rows = executeQueryAndReturnResult(sql)[1]
     return rows
 
@@ -19,6 +19,7 @@ def getGameInfoByName(name):
             return None
         gameInfo = result_set[0]
         data = {'prod_id': gameInfo[0], 'prod_name': gameInfo[1], 'price': float(gameInfo[2])}
+        print(['ID', 'Game', 'Quantity', 'Price($)'], data)
         return ['ID', 'Game', 'Quantity', 'Price($)'], data
     except Exception as e:
         print(e)
@@ -70,3 +71,15 @@ def updateCustomerInfo(id, email, address, phone, fname, lname):
 def updateCustomerInfoBlankAddress(id, email, phone, fname, lname):
     sql = f"CALL `store`.`update_customer_address_false`({id},'{fname}','{lname}','{email}','{phone}');"
     executeQueryAndCommit(sql)
+
+
+def createInvoice(custId, prodId, quantity):
+    sql1 = f"CALL `store`.`create_invoice`({custId});"
+    executeQueryAndCommit(sql1)
+    sql2 = f"SELECT MAX(invoice_id) FROM `store`.`invoices`;"
+    rows = list(executeQueryAndReturnResult(sql2))
+    invoice_id = rows[1][0]
+    sql3 = f"CALL `store`.`add_invoice_product`({invoice_id[0]}, {prodId}, {quantity});"
+    executeQueryAndCommit(sql3)
+    sql4 = f"UPDATE `store`.`products` SET inventory = inventory - {quantity} WHERE prod_id = {prodId};"
+    executeQueryAndCommit(sql4)

@@ -31,8 +31,8 @@ class MainWindow(QMainWindow):
         self.addProductButtonNewInvoiceTab.clicked.connect(self.addProductButtonNewInvoiceTabClickHandler)
         self.removeProductButtonNewInvoiceTab = self.findChild(QPushButton, 'removeProductButtonNewInvoiceTab')
         self.removeProductButtonNewInvoiceTab.clicked.connect(self.removeProductButtonNewInvoiceTabClickHandler)
-        self.purchaseButtonNewInvoiceTab = self.findChild(QPushButton, 'purchasebutton')
-        #self.purchaseButtonNewInvoiceTab.clicked.connect(purchaseButtonNewInvoiceTabClickHandler)
+        self.purchaseButtonNewInvoiceTab = self.findChild(QPushButton, 'purchaseButtonNewInvoiceTab')
+        self.purchaseButtonNewInvoiceTab.clicked.connect(self.purchaseButtonNewInvoiceTabClickHandler)
         customers = getCustomerNames()
         games = getProducts()
         for row in customers:
@@ -138,12 +138,25 @@ class MainWindow(QMainWindow):
                 quantity_cell = self.invoiceListTableWidgetNewInvoiceTab.item(row,2)
                 if price_cell is not None and quantity_cell is not None:
                     price = float(price_cell.text())
-                    quantity = int(quantity_cell.text())
                     total += price
             except ValueError:
                 pass
         self.invoiceTotalLineEditNewInvoiceTab.setText('$' + "{:.2f}".format(total))
 
+    def purchaseButtonNewInvoiceTabClickHandler(self):
+        cust_id = int(self.idLineEditNewInvoiceTab.text())
+
+        for row in range(self.invoiceListTableWidgetNewInvoiceTab.rowCount()):
+            try:
+                prod_id = int(self.invoiceListTableWidgetNewInvoiceTab.item(row, 0).text())
+                quantity = int(self.invoiceListTableWidgetNewInvoiceTab.item(row, 2).text())
+                createInvoice(cust_id, prod_id, quantity)
+            except ValueError:
+                pass
+
+        # Clear the invoice list table and reset the invoice total
+        self.invoiceListTableWidgetNewInvoiceTab.setRowCount(0)
+        self.getTotal()
 
     def addCustomerWidgetSetup(self):
         self.firstNameLineEditAddCustomerTab = self.findChild(QLineEdit, 'firstNameLineEditAddCustomerTab')
