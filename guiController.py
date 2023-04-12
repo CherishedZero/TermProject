@@ -164,6 +164,7 @@ class MainWindow(QMainWindow):
         self.emailLineEditAddCustomerTab = self.findChild(QLineEdit, 'emailLineEditAddCustomerTab')
         self.addressLineEditAddCustomerTab = self.findChild(QLineEdit, 'addressLineEditAddCustomerTab')
         self.phoneLineEditAddCustomerTab = self.findChild(QLineEdit, 'phoneLineEditAddCustomerTab')
+        self.feedbackLabelAddCustomerTab = self.findChild(QLabel, 'feedbackLabelAddCustomerTab')
         self.addCustomerButtonAddCustomerTab = self.findChild(QPushButton, 'addCustomerButtonAddCustomerTab')
         self.addCustomerButtonAddCustomerTab.clicked.connect(self.addCustomerButtonAddCustomerTabClickHandler)
 
@@ -174,21 +175,31 @@ class MainWindow(QMainWindow):
             email = self.emailLineEditAddCustomerTab.text()
             address = self.addressLineEditAddCustomerTab.text()
             phone = self.phoneLineEditAddCustomerTab.text()
-            assert all(field != '' for field in [fname, lname, email, phone]), 'All fields must have an entry'
+            assert all(field != '' for field in [fname, lname, email, phone]), 'Only Address can be left empty'
             if address != '':
                 addCustomer(fname, lname, email, address, phone)
                 self.nameComboBoxEditCustomerTab.clear()
                 self.nameComboBoxNewInvoiceTab.clear()
                 self.newInvoiceWidgetSetup()
                 self.editCustomerWidgetSetup()
+                self.clearAddCustomerFields()
             else:
                 addCustomerNoAddress(fname,lname, email, phone)
                 self.nameComboBoxEditCustomerTab.clear()
                 self.nameComboBoxNewInvoiceTab.clear()
                 self.newInvoiceWidgetSetup()
                 self.editCustomerWidgetSetup()
+                self.clearAddCustomerFields()
         except Exception as e:
-            print(e)
+            self.feedbackLabelAddCustomerTab.setText(str(e))
+
+    def clearAddCustomerFields(self):
+        self.feedbackLabelAddCustomerTab.setText(f"{self.firstNameLineEditAddCustomerTab.text()} successfully added to customer database")
+        self.firstNameLineEditAddCustomerTab.clear()
+        self.lastNameLineEditAddCustomerTab.clear()
+        self.emailLineEditAddCustomerTab.clear()
+        self.addressLineEditAddCustomerTab.clear()
+        self.phoneLineEditAddCustomerTab.clear()
 
     def editCustomerWidgetSetup(self):
         self.nameComboBoxEditCustomerTab = self.findChild(QComboBox, 'nameComboBoxEditCustomerTab')
@@ -198,6 +209,7 @@ class MainWindow(QMainWindow):
         self.phoneLineEditEditCustomerTab = self.findChild(QLineEdit, 'phoneLineEditEditCustomerTab')
         self.firstNameLineEditCustomerTab = self.findChild(QLineEdit, 'firstNameLineEditCustomerTab')
         self.lastNameLineEditEditCustomerTab = self.findChild(QLineEdit, 'lastNameLineEditEditCustomerTab')
+        self.feedbackLabelEditCustomerTab = self.findChild(QLabel, 'feedbackLabelEditCustomerTab')
         self.saveChangesButton = self.findChild(QPushButton, 'saveChangesButton')
         self.saveChangesButton.clicked.connect(self.saveChangesButtonClickHandler)
         customers = getCustomer()
@@ -226,7 +238,7 @@ class MainWindow(QMainWindow):
                 self.addressLineEditEditCustomerTab.setText(row[3] or '')
                 self.phoneLineEditEditCustomerTab.setText(row[4])
         except Exception as e:
-            print(e)
+            self.feedbackLabelEditCustomerTab.setText(str(e))
 
     def saveChangesButtonClickHandler(self):
         try:
@@ -236,10 +248,46 @@ class MainWindow(QMainWindow):
             phone = self.phoneLineEditEditCustomerTab.text()
             fname = self.firstNameLineEditCustomerTab.text()
             lname = self.lastNameLineEditEditCustomerTab.text()
+            assert all(field != '' for field in [fname, lname, email, phone]), 'Only address can be empty'
             if address != '':
                 updateCustomerInfo(id, email, address, phone, fname, lname)
+                self.editCustomerClear()
             else:
                 updateCustomerInfoBlankAddress(id, email, phone, fname, lname)
+                self.editCustomerClear()
+            self.refreshCustomersComboBoxes()
+        except Exception as e:
+            self.feedbackLabelEditCustomerTab.setText(str(e))
+
+    def editCustomerClear(self):
+        self.feedbackLabelEditCustomerTab.setText(f"Customer information successfully edited")
+        self.nameComboBoxEditCustomerTab.clear()
+        self.idNameLineEditEditCustomerTab.clear()
+        self.emailLineEditEditCustomerTab.clear()
+        self.addressLineEditEditCustomerTab.clear()
+        self.phoneLineEditEditCustomerTab.clear()
+        self.firstNameLineEditCustomerTab.clear()
+        self.lastNameLineEditEditCustomerTab.clear()
+
+    def invoiceCustomerClear(self):
+        self.nameComboBoxNewInvoiceTab.clear()
+        self.emailLineNewInvoiceTab.clear()
+        self.idLineEditNewInvoiceTab.clear()
+
+
+
+    def refreshCustomersComboBoxes(self):
+        self.editCustomerClear()
+        self.invoiceCustomerClear()
+        try:
+            customers = getCustomer()
+            for row in customers:
+                self.nameComboBoxEditCustomerTab.addItem(str(row[1]), userData=[row[1], row[0], row[2], row[3], row[4], row[5], row[6]])
+            self.nameComboBoxEditCustomerTab.currentIndexChanged.connect(self.idComboBoxEditCustomerTabCurrentIndexChangedHandler)
+            customers = getCustomerNames()
+            for row in customers:
+                self.nameComboBoxNewInvoiceTab.addItem(row[1], userData=[row[0], row[2]])
+            self.nameComboBoxNewInvoiceTab.currentIndexChanged.connect(self.nameComboBoxNewInvoiceTabCurrentIndexChangedHandler)
         except Exception as e:
             print(e)
 

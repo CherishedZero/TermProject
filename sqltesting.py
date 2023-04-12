@@ -1,4 +1,4 @@
-from testingmysql_func import *
+from SQLConnector import *
 
 def getCustomerNames():
     sql = f"CALL `store`.`customer_info_invoice`();"
@@ -81,5 +81,12 @@ def createInvoice(custId, prodId, quantity):
     invoice_id = rows[1][0]
     sql3 = f"CALL `store`.`add_invoice_product`({invoice_id[0]}, {prodId}, {quantity});"
     executeQueryAndCommit(sql3)
-    sql4 = f"UPDATE `store`.`products` SET inventory = inventory - {quantity} WHERE prod_id = {prodId};"
+    sql4 = f"CALL `store`.`adjust_stock`({prodId}, -{quantity});"
     executeQueryAndCommit(sql4)
+
+def checkStock(prodId):
+    sql = f"SELECT inventory FROM products WHERE prod_id = {prodId}"
+    info = executeQueryAndReturnResult(sql)
+    print(info)
+
+checkStock(3)
