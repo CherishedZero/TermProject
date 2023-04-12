@@ -177,8 +177,16 @@ class MainWindow(QMainWindow):
             assert all(field != '' for field in [fname, lname, email, phone]), 'All fields must have an entry'
             if address != '':
                 addCustomer(fname, lname, email, address, phone)
+                self.nameComboBoxEditCustomerTab.clear()
+                self.nameComboBoxNewInvoiceTab.clear()
+                self.newInvoiceWidgetSetup()
+                self.editCustomerWidgetSetup()
             else:
                 addCustomerNoAddress(fname,lname, email, phone)
+                self.nameComboBoxEditCustomerTab.clear()
+                self.nameComboBoxNewInvoiceTab.clear()
+                self.newInvoiceWidgetSetup()
+                self.editCustomerWidgetSetup()
         except Exception as e:
             print(e)
 
