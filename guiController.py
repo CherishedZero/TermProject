@@ -3,6 +3,7 @@ import sys
 
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
+from PyQt6.QtCore import Qt
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -16,6 +17,7 @@ class MainWindow(QMainWindow):
         self.addCustomerWidgetSetup()
         self.editCustomerWidgetSetup()
         self.items = {}
+        self.table_key = {}
 
     def newInvoiceWidgetSetup(self):
         self.nameComboBoxNewInvoiceTab = self.findChild(QComboBox, 'nameComboBoxNewInvoiceTab')
@@ -29,8 +31,8 @@ class MainWindow(QMainWindow):
         self.addProductButtonNewInvoiceTab.clicked.connect(self.addProductButtonNewInvoiceTabClickHandler)
         self.removeProductButtonNewInvoiceTab = self.findChild(QPushButton, 'removeProductButtonNewInvoiceTab')
         self.removeProductButtonNewInvoiceTab.clicked.connect(self.removeProductButtonNewInvoiceTabClickHandler)
-        self.purchaseButtonNewInvoiceTab = self.findChild(QPushButton, 'purchasebutton')
-        #self.purchaseButtonNewInvoiceTab.clicked.connect(purchaseButtonNewInvoiceTabClickHandler)
+        self.purchaseButtonNewInvoiceTab = self.findChild(QPushButton, 'purchaseButtonNewInvoiceTab')
+        self.purchaseButtonNewInvoiceTab.clicked.connect(self.purchaseButtonNewInvoiceTabClickHandler)
         customers = getCustomerNames()
         games = getProducts()
         for row in customers:
@@ -57,48 +59,104 @@ class MainWindow(QMainWindow):
 
     def displayGameInfoInTable(self, columns, rows, table:QTableWidget):
         num_rows = table.rowCount()
-        table.setRowCount(num_rows + len(rows))
         table.setColumnCount(len(columns))
         quantity = self.productNumberSpinBoxNewInvoiceTab.value()
-        for i in range(num_rows, num_rows + len(rows)):
-            row = rows[i - num_rows]
+
+        for row in rows:
+            keys = list(row.keys())
+            values = list(row.values())
+            item_key = values[0]
+            item_info = {keys[1]: values[1], keys[2]: values[2]}
             self.items = row
-            for j in range(len(columns)):
-                try:
+
+            if item_key in self.table_key:
+                self.table_key[item_key]['quantity'] += quantity
+                current_price = self.table_key[item_key]['price']
+                updated_price = round(current_price * self.table_key[item_key]['quantity'], 2)
+                for i in range(num_rows):
+                    if table.item(i, 0).text() == str(item_key):
+                        row_index = i
+                        break
+                current_quantity = int(table.item(row_index, 2).text())
+                new_quantity = quantity + current_quantity
+                table.item(row_index, 2).setText(str(new_quantity))
+                table.item(row_index, 3).setText(str(updated_price))
+
+            else:
+                self.table_key[item_key] = {'prod_name': item_info['prod_name'],
+                                            'price': item_info['price'],
+                                            'quantity': quantity}
+                table.setRowCount(num_rows + 1)
+                i = num_rows
+                item_row = []
+                for j in range(len(columns)):
                     if j == 0:
                         item = QTableWidgetItem(str(row['prod_id']))
                     elif j == 1:
                         item = QTableWidgetItem(row['prod_name'])
                     elif j == 2:
+                        item = QTableWidgetItem(str(quantity))
+                    elif j == 3:
                         base_price = float(self.items['price'])
                         modified_price = base_price * quantity
-                        item = QTableWidgetItem(str(modified_price))
-                    elif j == 3:
-                        item = QTableWidgetItem(str(quantity))
+                        item = QTableWidgetItem(str(round(modified_price,2)))
+                    item_row.append(item)
                     table.setItem(i, j, item)
-                except Exception as e:
-                    print(f"Error: {e}, row: {i}, column: {j}, value: {self.items[list(self.items.keys())[j]]}")
-            for i in range(table.columnCount()):
-                table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
+
+        for i in range(table.columnCount()):
+            table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
     def removeProductButtonNewInvoiceTabClickHandler(self):
         selected_row = self.invoiceListTableWidgetNewInvoiceTab.currentRow()
+        quantity = self.productNumberSpinBoxNewInvoiceTab.value()
         if selected_row >= 0:
-            self.invoiceListTableWidgetNewInvoiceTab.removeRow(selected_row)
-            self.getTotal()
+            prod_id = int(self.invoiceListTableWidgetNewInvoiceTab.item(selected_row, 0).text())
+            current_quantity = int(self.invoiceListTableWidgetNewInvoiceTab.item(selected_row, 2).text())
+
+            if current_quantity > quantity:
+                # Update the quantity and price of the product
+                current_price = float(self.invoiceListTableWidgetNewInvoiceTab.item(selected_row, 3).text())
+                base_price = current_price / current_quantity
+                new_quantity = current_quantity - quantity
+                new_price = round(base_price * new_quantity, 2)
+
+                # Update the table with the new quantity and price
+                self.invoiceListTableWidgetNewInvoiceTab.item(selected_row, 2).setText(str(new_quantity))
+                self.invoiceListTableWidgetNewInvoiceTab.item(selected_row, 3).setText(str(new_price))
+                self.getTotal()
+            else:
+                # Remove the entire row from the table
+                self.invoiceListTableWidgetNewInvoiceTab.removeRow(selected_row)
+                del self.table_key[prod_id]
+                self.getTotal()
 
     def getTotal(self):
         total = 0.0
         for row in range(self.invoiceListTableWidgetNewInvoiceTab.rowCount()):
             try:
-                price_cell = self.invoiceListTableWidgetNewInvoiceTab.item(row, 2)
-                if price_cell is not None:
+                price_cell = self.invoiceListTableWidgetNewInvoiceTab.item(row, 3)
+                quantity_cell = self.invoiceListTableWidgetNewInvoiceTab.item(row,2)
+                if price_cell is not None and quantity_cell is not None:
                     price = float(price_cell.text())
                     total += price
             except ValueError:
                 pass
         self.invoiceTotalLineEditNewInvoiceTab.setText('$' + "{:.2f}".format(total))
 
+    def purchaseButtonNewInvoiceTabClickHandler(self):
+        cust_id = int(self.idLineEditNewInvoiceTab.text())
+
+        for row in range(self.invoiceListTableWidgetNewInvoiceTab.rowCount()):
+            try:
+                prod_id = int(self.invoiceListTableWidgetNewInvoiceTab.item(row, 0).text())
+                quantity = int(self.invoiceListTableWidgetNewInvoiceTab.item(row, 2).text())
+                createInvoice(cust_id, prod_id, quantity)
+            except ValueError:
+                pass
+
+        # Clear the invoice list table and reset the invoice total
+        self.invoiceListTableWidgetNewInvoiceTab.setRowCount(0)
+        self.getTotal()
 
     def addCustomerWidgetSetup(self):
         self.firstNameLineEditAddCustomerTab = self.findChild(QLineEdit, 'firstNameLineEditAddCustomerTab')
@@ -119,8 +177,16 @@ class MainWindow(QMainWindow):
             assert all(field != '' for field in [fname, lname, email, phone]), 'All fields must have an entry'
             if address != '':
                 addCustomer(fname, lname, email, address, phone)
+                self.nameComboBoxEditCustomerTab.clear()
+                self.nameComboBoxNewInvoiceTab.clear()
+                self.newInvoiceWidgetSetup()
+                self.editCustomerWidgetSetup()
             else:
                 addCustomerNoAddress(fname,lname, email, phone)
+                self.nameComboBoxEditCustomerTab.clear()
+                self.nameComboBoxNewInvoiceTab.clear()
+                self.newInvoiceWidgetSetup()
+                self.editCustomerWidgetSetup()
         except Exception as e:
             print(e)
 
