@@ -19,7 +19,6 @@ def getGameInfoByName(name):
             return None
         gameInfo = result_set[0]
         data = {'prod_id': gameInfo[0], 'prod_name': gameInfo[1], 'price': float(gameInfo[2])}
-        print(['ID', 'Game', 'Quantity', 'Price($)'], data)
         return ['ID', 'Game', 'Quantity', 'Price($)'], data
     except Exception as e:
         print(e)
@@ -90,3 +89,36 @@ def checkStock(prodId):
     print(info)
 
 checkStock(3)
+
+def addProduct(prod_name, genre, dev, release, price, vendor_id):
+    sql = f"CALL `store`.`add_product`('{prod_name}', '{genre}', '{dev}', '{release}', {price}, 0, {vendor_id});"
+    executeQueryAndCommit(sql)
+
+def getVendors():
+    sql = f"CALL `store`.`vendor_list`();"
+    rows = executeQueryAndReturnResult(sql)[1]
+    return rows
+
+def addVendor(name):
+    sql = f"CALL `store`.`add_vendor`('{name}');"
+    executeQueryAndCommit(sql)
+
+def getAllInventory():
+    sql = f"CALL `store`.`product_list`();"
+    return  executeQueryAndReturnResult(sql)
+
+
+def outOfStock():
+    sql = f"CALL `store`.`out_of_stock`();"
+    return executeQueryAndReturnResult(sql)
+
+def getAllVendors():
+    sql = f"CALL `store`.`vendor_list`();"
+    return executeQueryAndReturnResult(sql)
+
+def getAllCustomers():
+    sql = f"CALL `store`.`customer_list`();"
+    return executeQueryAndReturnResult(sql)
+
+
+print(getVendors())
