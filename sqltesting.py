@@ -46,7 +46,7 @@ def addCustomerNoAddress(fname, lname, email, phone):
     executeQueryAndCommit(sql)
 
 def getCustomer():
-    sql = f"SELECT customer_id, CONCAT(first_name, ' ', last_name), email, address, phone, first_name, last_name FROM customers;"
+    sql = f"CALL `store`.`customer_full_info`();"
     rows = executeQueryAndReturnResult(sql)[1]
     return rows
 
@@ -86,7 +86,7 @@ def createInvoice(custId, prodId, quantity):
 def checkStock(prodId):
     sql = f"SELECT inventory FROM products WHERE prod_id = {prodId}"
     info = executeQueryAndReturnResult(sql)
-    print(info)
+    return(info[1])
 
 checkStock(3)
 
@@ -96,8 +96,7 @@ def addProduct(prod_name, genre, dev, release, price, vendor_id):
 
 def getVendors():
     sql = f"CALL `store`.`vendor_list`();"
-    rows = executeQueryAndReturnResult(sql)[1]
-    return rows
+    return executeQueryAndReturnResult(sql)[1]
 
 def addVendor(name):
     sql = f"CALL `store`.`add_vendor`('{name}');"
@@ -105,7 +104,7 @@ def addVendor(name):
 
 def getAllInventory():
     sql = f"CALL `store`.`product_list`();"
-    return  executeQueryAndReturnResult(sql)
+    return executeQueryAndReturnResult(sql)
 
 
 def outOfStock():
