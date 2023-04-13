@@ -4,6 +4,7 @@ def getCustomerNames():
     sql = f"CALL `store`.`customer_info_invoice`();"
     rows = executeQueryAndReturnResult(sql)[1]
     return rows
+print(getCustomerNames())
 
 def getProducts():
     sql = f"CALL `store`.`product_list`();"
@@ -119,5 +120,3 @@ def getAllCustomers():
     sql = f"CALL `store`.`customer_list`();"
     return executeQueryAndReturnResult(sql)
 
-
-print(getVendors())
