@@ -95,10 +95,6 @@ def addProduct(prod_name, genre, dev, release, price, vendor_id):
     sql = f"CALL `store`.`add_product`('{prod_name}', '{genre}', '{dev}', '{release}', {price}, 0, {vendor_id});"
     executeQueryAndCommit(sql)
 
-def getVendors():
-    sql = f"CALL `store`.`vendor_list`();"
-    return executeQueryAndReturnResult(sql)[1]
-
 def addVendor(name):
     sql = f"CALL `store`.`add_vendor`('{name}');"
     executeQueryAndCommit(sql)
@@ -114,9 +110,25 @@ def outOfStock():
 
 def getAllVendors():
     sql = f"CALL `store`.`vendor_list`();"
+    print(executeQueryAndReturnResult(sql))
+    return executeQueryAndReturnResult(sql)[1]
+
+def getAllVendorsForTable():
+    sql = f"CALL `store`.`vendor_list`();"
+    print(executeQueryAndReturnResult(sql))
     return executeQueryAndReturnResult(sql)
+
+def updateVendor(id, name):
+    sql = f"CALL `store`.`update_vendor`({id},'{name}');"
+    executeQueryAndCommit(sql)
+
 
 def getAllCustomers():
     sql = f"CALL `store`.`customer_list`();"
     return executeQueryAndReturnResult(sql)
+
+def getProductss():
+    sql = f"CALL `store`.`prod_full_info`();"
+    return executeQueryAndReturnResult(sql)[1]
+
 

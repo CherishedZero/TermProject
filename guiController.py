@@ -290,17 +290,19 @@ class MainWindow(QMainWindow):
         self.lastNameLineEditEditCustomerTab.clear()
 
     def invoiceCustomerClear(self):
-        print("Before check:", self.nameComboBoxNewInvoiceTab)
-        if self.nameComboBoxNewInvoiceTab is not None:
-            print("After check:", self.nameComboBoxNewInvoiceTab)
-            if self.nameComboBoxNewInvoiceTab.hasFocus():
-                self.nameComboBoxNewInvoiceTab.clearFocus()
-            self.nameComboBoxNewInvoiceTab.setCurrentIndex(-1)
-            self.nameComboBoxNewInvoiceTab.clear()
-        else:
-            self.nameComboBoxNewInvoiceTab.clear()
-        self.emailLineEditNewInvoiceTab.clear()
-        self.idLineEditNewInvoiceTab.clear()
+        pass
+        #self.emailLineEditNewInvoiceTab.clear()
+        #self.idLineEditNewInvoiceTab.clear()
+        #print("Before check:", self.nameComboBoxNewInvoiceTab)
+        #if self.nameComboBoxNewInvoiceTab is not None:
+        #    print("After check:", self.nameComboBoxNewInvoiceTab)
+        #    if self.nameComboBoxNewInvoiceTab.hasFocus():
+        #        self.nameComboBoxNewInvoiceTab.clearFocus()
+        #    self.nameComboBoxNewInvoiceTab.setCurrentIndex(-1)
+        #    self.nameComboBoxNewInvoiceTab.clear()
+        #else:
+        #    self.nameComboBoxNewInvoiceTab.clear()
+
 
     def refreshCustomersComboBoxes(self):
         self.refreshProductTables()
@@ -328,14 +330,17 @@ class MainWindow(QMainWindow):
         self.feedbackLabelAddProductTab = self.findChild(QLineEdit, 'feedbackLabelAddProductTab')
         self.addProductButtonAddProductTab = self.findChild(QPushButton, 'addProductButtonAddProductTab')
         self.addProductButtonAddProductTab.clicked.connect(self.addProductButtonAddProductTabClickHandler)
-        vendors = getVendors()
+        vendors = getAllVendors()
         for row in vendors:
             self.vendorNameComboBoxAddProductTab.addItem(row[1], userData=[row[0]])
         self.vendorNameComboBoxAddProductTab.currentIndexChanged.connect(self.vendorNameComboBoxAddProductTabCurrentIndexChangedHandler)
 
     def vendorNameComboBoxAddProductTabCurrentIndexChangedHandler(self):
-        id = self.vendorNameComboBoxAddProductTab.currentData()[0]
-        self.vendorIdLineEditAddProductTab.setText(str(id))
+        try:
+            vendorId = self.vendorNameComboBoxAddProductTab.currentData()[0]
+            self.vendorIdLineEditAddProductTab.setText(str(vendorId))
+        except Exception as e:
+            print(e)
 
     def addProductButtonAddProductTabClickHandler(self):
         try:
@@ -352,24 +357,62 @@ class MainWindow(QMainWindow):
             assert all(field != '' for field in [prod_name, genre, dev, release, price_float, vendor_id])
 
             addProduct(prod_name, genre, dev, release, float(price), int(vendor_id))
+            self.refreshProducts()
         except Exception as e:
             self.feedbackLabelAddProductTab.setText(str(e))
 
     def manageInventoryWidgetSetup(self):
-        self.productNameComboBoxEditInventoryTab = self.findChild(QLineEdit, 'productNameComboBoxEditInventoryTab')
+        self.productNameComboBoxEditInventoryTab = self.findChild(QComboBox, 'productNameComboBoxEditInventoryTab')
         self.newProductNameLineEditManageInventoryTab = self.findChild(QLineEdit, 'newProductNameLineEditManageInventoryTab')
         self.newProductGenreLineEditManageInventoryTab = self.findChild(QLineEdit, 'newProductGenreLineEditManageInventoryTab')
         self.newProductDeveloperLineEditManageInventoryTab = self.findChild(QLineEdit, 'newProductDeveloperLineEditManageInventoryTab')
         self.newProductReleaseDateManageInventoryTab = self.findChild(QDateEdit, 'newProductReleaseDateManageInventoryTab')
         self.newProductPriceLineEditManageInventoryTab = self.findChild(QLineEdit, 'newProductPriceLineEditManageInventoryTab')
         self.newVendorNameComboBoxManageInventoryTab = self.findChild(QComboBox, 'newVendorNameComboBoxManageInventoryTab')
+        self.vendorIdLineEditManageInventoryTab = self.findChild(QLineEdit, 'vendorIdLineEditManageInventoryTab')
         self.productIdLineEditManageInventoryTab = self.findChild(QLineEdit, 'productIdLineEditManageInventoryTab')
         self.currentInventoryLineEditManageInventoryTab = self.findChild(QLineEdit, 'currentInventoryLineEditManageInventoryTab')
-        self.quantitySpinBoxManageInventoryTab = self.findChild(QSpinBox, 'quantitySpinBoxManageInventoryTab')
-        self.addQuantityButtonManageInventoryTab = self.findChild(QComboBox, 'addQuantityButtonManageInventoryTab')
-        self.removeQuantityButtonManageInventoryTab = self.findChild(QLineEdit, 'removeQuantityButtonManageInventoryTab')
-        self.saveChangesButtonManageInventoryTab = self.findChild(QLineEdit, 'saveChangesButtonManageInventoryTab')
-        self.feedbackLabelManageInventoryTab = self.findChild(QLabel, 'feedbackLabelManageInventoryTab')
+        self.saveChangesButtonManageInventoryTab = self.findChild(QPushButton, 'saveChangesButtonManageInventoryTab')
+        self.saveChangesButtonManageInventoryTab.clicked.connect(self.saveChangesButtonManageInventoryTabClickHandler)
+        products = getProductss()
+        for row in products:
+            self.productNameComboBoxEditInventoryTab.addItem(str(row[1]), userData=[row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]])
+        self.productNameComboBoxEditInventoryTab.currentIndexChanged.connect(self.productNameComboBoxEditInventoryTabCurrentIndexHandler)
+        vendors = getAllVendors()
+        for row in vendors:
+            self.newVendorNameComboBoxManageInventoryTab.addItem(str(row[1]), userData=[row[0], row[1]])
+        self.newVendorNameComboBoxManageInventoryTab.currentIndexChanged.connect(self.newVendorNameComboBoxManageInventoryTabCurrentIndexHandler)
+
+    def productNameComboBoxEditInventoryTabCurrentIndexHandler(self):
+        try:
+            row = self.productNameComboBoxEditInventoryTab.currentData()
+            self.productIdLineEditManageInventoryTab.setText(str(row[0]))
+            self.newProductNameLineEditManageInventoryTab.setText(row[1])
+            self.newProductGenreLineEditManageInventoryTab.setText(row[2])
+            self.newProductDeveloperLineEditManageInventoryTab.setText(row[3])
+            # self.newProductReleaseDateManageInventoryTab.setText(row[4])
+            self.newProductPriceLineEditManageInventoryTab.setText(str(row[5]))
+            self.currentInventoryLineEditManageInventoryTab.setText(str(row[6]))
+        except Exception as e:
+            print(e)
+
+    def newVendorNameComboBoxManageInventoryTabCurrentIndexHandler(self):
+        try:
+            vendorId = self.newVendorNameComboBoxManageInventoryTab.currentData()[0]
+            self.vendorIdLineEditManageInventoryTab.setText(str(vendorId))
+        except Exception as e:
+            print(e)
+
+    def saveChangesButtonManageInventoryTabClickHandler(self):
+        prod_id = self.productIdLineEditManageInventoryTab.text()
+        name = self.newProductNameLineEditManageInventoryTab.text()
+        genre = self.newProductGenreLineEditManageInventoryTab.text()
+        dev = self.newProductDeveloperLineEditManageInventoryTab.text()
+        date = self.newProductReleaseDateManageInventoryTab.text()
+        price = self.newProductPriceLineEditManageInventoryTab.text()
+        vendor = self.vendorIdLineEditManageInventoryTab.text()
+        updateProduct(prod_id, name, genre, dev, date, price, vendor)
+        self.refreshProducts()
 
     def addVendorWidgetSetup(self):
         self.vendorNameLineEditAddVendorTab = self.findChild(QLineEdit, 'vendorNameLineEditAddVendorTab')
@@ -382,6 +425,7 @@ class MainWindow(QMainWindow):
             vendor_name = self.vendorNameLineEditAddVendorTab.text()
             assert vendor_name != '', 'Name cannot be empty'
             addVendor(vendor_name)
+            self.refreshVendors()
         except Exception as e:
             self.feedbackLabelAddVendorTab.setText(e)
 
@@ -390,7 +434,58 @@ class MainWindow(QMainWindow):
         self.newVendorNameLineEditEditVendorTab = self.findChild(QLineEdit, 'newVendorNameLineEditEditVendorTab')
         self.vendorIdLineEditEditVendorTab = self.findChild(QLineEdit, 'vendorIdLineEditEditVendorTab')
         self.saveChangesButtonEditVendorTab = self.findChild(QPushButton, 'saveChangesButtonEditVendorTab')
-        self.feedbackLabelEditVendorTab = self.findChild(QLabel, 'feedbackLabelEditVendorTab')
+        self.saveChangesButtonEditVendorTab.clicked.connect(self.saveChangesButtonEditVendorTabClickHandler)
+        vendors = getAllVendors()
+        for row in vendors:
+            self.vendorNameComboBoxEditVendorTab.addItem(str(row[1]), userData=[row[0], row[1]])
+        self.vendorNameComboBoxEditVendorTab.currentIndexChanged.connect(
+            self.vendorNameComboBoxEditVendorTabCurrentIndexChangedHandler)
+
+    def vendorNameComboBoxEditVendorTabCurrentIndexChangedHandler(self):
+        try:
+            vendorId = self.vendorNameComboBoxEditVendorTab.currentData()[0]
+            self.vendorIdLineEditEditVendorTab.setText(str(vendorId))
+        except Exception as e:
+            print(e)
+
+    def saveChangesButtonEditVendorTabClickHandler(self):
+        vendor_name = self.newVendorNameLineEditEditVendorTab.text()
+        vendor_id = int(self.vendorIdLineEditEditVendorTab.text())
+        updateVendor(vendor_id, vendor_name)
+        self.refreshVendors()
+
+    def refreshVendors(self):
+        self.newVendorNameLineEditEditVendorTab.clear()
+        self.vendorIdLineEditEditVendorTab.clear()
+        self.vendorNameComboBoxEditVendorTab.clear()
+        self.vendorNameComboBoxAddProductTab.clear()
+        self.newVendorNameComboBoxManageInventoryTab.clear()
+        vendors = getAllVendors()
+        for row in vendors:
+            self.vendorNameComboBoxEditVendorTab.addItem(str(row[1]), userData=[row[0], row[1]])
+        vendors = getAllVendors()
+        for row in vendors:
+            self.newVendorNameComboBoxManageInventoryTab.addItem(str(row[1]), userData=[row[0], row[1]])
+        self.newVendorNameComboBoxManageInventoryTab.currentIndexChanged.connect(self.newVendorNameComboBoxManageInventoryTabCurrentIndexHandler)
+        vendors = getAllVendors()
+        for row in vendors:
+            self.vendorNameComboBoxAddProductTab.addItem(row[1], userData=[row[0]])
+        self.vendorNameComboBoxAddProductTab.currentIndexChanged.connect(
+            self.vendorNameComboBoxAddProductTabCurrentIndexChangedHandler)
+
+    def refreshProducts(self):
+        self.productNameComboBoxEditInventoryTab.clear()
+        self.productComboBoxNewInvoiceTab.clear()
+        games = getProducts()
+        for game in games:
+            self.productComboBoxNewInvoiceTab.addItem(str(game[1]))
+        products = getProductss()
+        for row in products:
+            self.productNameComboBoxEditInventoryTab.addItem(str(row[1]),
+                                                             userData=[row[0], row[1], row[2], row[3], row[4], row[5],
+                                                                       row[6], row[7]])
+        self.productNameComboBoxEditInventoryTab.currentIndexChanged.connect(
+            self.productNameComboBoxEditInventoryTabCurrentIndexHandler)
 
     def shipmentWidgetSetup(self):
         self.productComboBoxShipmentsTab = self.findChild(QComboBox, 'productComboBoxShipmentsTab')
@@ -419,7 +514,7 @@ class MainWindow(QMainWindow):
             colNames, data = outOfStock()
             self.displayOutOfStockInTable(colNames, data, self.viewTableWidgetViewTab)
         elif currently == 'Vendors':
-            colNames, data = getAllVendors()
+            colNames, data = getAllVendorsForTable()
             self.displayVendorsInTable(colNames, data, self.viewTableWidgetViewTab)
         elif currently == 'Customers':
             colNames, data = getAllCustomers()
