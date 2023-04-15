@@ -43,7 +43,7 @@
        <bool>false</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="newInvoiceTab">
        <attribute name="title">
@@ -438,19 +438,6 @@
           </rect>
          </property>
          <property name="text">
-          <string/>
-         </property>
-        </widget>
-        <widget class="QGroupBox" name="groupBox">
-         <property name="geometry">
-          <rect>
-           <x>310</x>
-           <y>320</y>
-           <width>781</width>
-           <height>581</height>
-          </rect>
-         </property>
-         <property name="title">
           <string/>
          </property>
         </widget>
@@ -1002,10 +989,10 @@
         <widget class="QPushButton" name="saveChangesButtonManageInventoryTab">
          <property name="geometry">
           <rect>
-           <x>420</x>
-           <y>430</y>
-           <width>81</width>
-           <height>61</height>
+           <x>140</x>
+           <y>440</y>
+           <width>261</width>
+           <height>21</height>
           </rect>
          </property>
          <property name="text">
@@ -1183,52 +1170,16 @@
          <property name="geometry">
           <rect>
            <x>140</x>
-           <y>430</y>
-           <width>42</width>
+           <y>390</y>
+           <width>261</width>
            <height>22</height>
           </rect>
          </property>
-        </widget>
-        <widget class="QLineEdit" name="currentInventoryLineEditManageInventoryTab">
-         <property name="enabled">
-          <bool>false</bool>
+         <property name="cursor">
+          <cursorShape>UpArrowCursor</cursorShape>
          </property>
-         <property name="geometry">
-          <rect>
-           <x>140</x>
-           <y>390</y>
-           <width>261</width>
-           <height>20</height>
-          </rect>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="addQuantityButtonManageInventoryTab">
-         <property name="geometry">
-          <rect>
-           <x>190</x>
-           <y>430</y>
-           <width>211</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Add Quantity of Product To Inventory</string>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="removeQuantityButtonManageInventoryTab">
-         <property name="geometry">
-          <rect>
-           <x>140</x>
-           <y>470</y>
-           <width>261</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Remove Quantity of Product From Inventory</string>
+         <property name="displayIntegerBase">
+          <number>11</number>
          </property>
         </widget>
         <widget class="QLabel" name="feedbackLabelManageInventoryTab">
