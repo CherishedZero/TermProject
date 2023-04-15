@@ -59,8 +59,8 @@ def checkStock(prodId):
     info = execute_and_return(sql)
     return(info[1])
 
-def addProduct(prod_name, genre, dev, release, price, vendor_id):
-    sql = f"CALL `store`.`add_product`('{prod_name}', '{genre}', '{dev}', '{release}', {price}, 0, {vendor_id});"
+def addProduct(prod_name, genre, dev, release, price, quantity, vendor_id):
+    sql = f"CALL `store`.`add_product`('{prod_name}', '{genre}', '{dev}', '{release}', {price}, {quantity}, {vendor_id});"
     execute_and_commit(sql)
 
 def addVendor(name):
@@ -95,7 +95,7 @@ def getAllCustomers():
 
 def getRecentCustomers():
     sql = f"CALL store.recent_customers;"
-    return ExecuteAndReturn(sql)
+    return execute_and_return(sql)
 
 def getProducts():
     sql = f"CALL `store`.`prod_full_info`();"
@@ -103,14 +103,15 @@ def getProducts():
 
 def updateVendor(vendor_id, vendor_name):
     sql_query = f"CALL store.update_vendor({vendor_id}, '{vendor_name}');"
-    ExecuteAndCommit(sql_query)
+    execute_and_commit(sql_query)
 
 def adjustStock(product_id, quantity):
     sql_query = f"CALL store.adjust_stock({product_id}, '{quantity}');"
-    ExecuteAndCommit(sql_query)
+    execute_and_commit(sql_query)
 
-def updateProduct(prod_id, name, genre, dev, date, price, vendor, stock=100):
+def updateProduct(prod_id, name, genre, dev, date, price, stock, vendor):
     sql_query = f"CALL store.update_product({prod_id}, '{name}', '{genre}', '{dev}', '{date}', {price}, {stock}, {vendor})"
     execute_and_commit(sql_query)
+
 
 

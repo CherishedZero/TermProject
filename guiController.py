@@ -1,5 +1,6 @@
 from sqltesting import *
 import sys
+from random import randint
 
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
@@ -544,12 +545,14 @@ class MainWindow(QMainWindow):
         self.productDeveloperLineEditAddProductTab = self.findChild(QLineEdit, 'productDeveloperLineEditAddProductTab')
         self.productReleaseDateAddProductTab = self.findChild(QDateEdit, 'productReleaseDateAddProductTab')
         self.productPriceLineEditAddProductTab = self.findChild(QLineEdit, 'productPriceLineEditAddProductTab')
+        self.startingInventorySpinBoxAddProductTab = self.findChild(QSpinBox, 'startingInventorySpinBoxAddProductTab')
         self.vendorNameComboBoxAddProductTab = self.findChild(QComboBox, 'vendorNameComboBoxAddProductTab')
         self.vendorIdLineEditAddProductTab = self.findChild(QLineEdit, 'vendorIdLineEditAddProductTab')
         self.feedbackLabelAddProductTab = self.findChild(QLabel, 'feedbackLabelAddProductTab')
         self.addProductButtonAddProductTab = self.findChild(QPushButton, 'addProductButtonAddProductTab')
         self.addProductButtonAddProductTab.clicked.connect(self.addProductButtonAddProductTabClickHandler)
         vendors = getAllVendors()
+        self.vendorIdLineEditAddProductTab.setText(str(vendors[0][0]))
         for row in vendors:
             self.vendorNameComboBoxAddProductTab.addItem(row[1], userData=[row[0]])
         self.vendorNameComboBoxAddProductTab.currentIndexChanged.connect(self.vendorNameComboBoxAddProductTabCurrentIndexChangedHandler)
@@ -585,15 +588,16 @@ class MainWindow(QMainWindow):
             genre = self.productGenreLineEditAddProductTab.text()
             dev = self.productDeveloperLineEditAddProductTab.text()
             release = self.productReleaseDateAddProductTab.date().toString('yyyy-MM-dd')
+            inventory = self.startingInventorySpinBoxAddProductTab.text()
             try:
                 price = self.productPriceLineEditAddProductTab.text()
                 price_float = float(price)
             except ValueError:
                 self.feedbackLabelAddProductTab.setText(str(e))
             vendor_id = self.vendorIdLineEditAddProductTab.text()
-            assert all(field != '' for field in [prod_name, genre, dev, release, price_float, vendor_id])
+            assert all(field != '' for field in [prod_name, genre, dev, release, price_float, vendor_id, inventory])
 
-            addProduct(prod_name, genre, dev, release, float(price), int(vendor_id))
+            addProduct(prod_name, genre, dev, release, float(price), int(inventory), int(vendor_id) )
             self.feedbackLabelAddProductTab.setText(f"{prod_name} successfully added")
             self.clearAddProducts()
             self.refreshProducts()
@@ -629,14 +633,22 @@ class MainWindow(QMainWindow):
         self.newVendorNameComboBoxManageInventoryTab = self.findChild(QComboBox, 'newVendorNameComboBoxManageInventoryTab')
         self.vendorIdLineEditManageInventoryTab = self.findChild(QLineEdit, 'vendorIdLineEditManageInventoryTab')
         self.productIdLineEditManageInventoryTab = self.findChild(QLineEdit, 'productIdLineEditManageInventoryTab')
-        self.currentInventoryLineEditManageInventoryTab = self.findChild(QLineEdit, 'currentInventoryLineEditManageInventoryTab')
+        self.quantitySpinBoxManageInventoryTab = self.findChild(QSpinBox, 'quantitySpinBoxManageInventoryTab')
         self.saveChangesButtonManageInventoryTab = self.findChild(QPushButton, 'saveChangesButtonManageInventoryTab')
         self.saveChangesButtonManageInventoryTab.clicked.connect(self.saveChangesButtonManageInventoryTabClickHandler)
         products = getProducts()
+        self.newProductNameLineEditManageInventoryTab.setText(products[0][1])
+        self.newProductGenreLineEditManageInventoryTab.setText(products[0][2])
+        self.newProductDeveloperLineEditManageInventoryTab.setText(products[0][3])
+        self.newProductReleaseDateManageInventoryTab.setDate(products[0][4])
+        self.newProductPriceLineEditManageInventoryTab.setText(str(products[0][5]))
+        self.productIdLineEditManageInventoryTab.setText(str(products[0][0]))
+        self.quantitySpinBoxManageInventoryTab.setValue(products[0][6])
         for row in products:
             self.productNameComboBoxEditInventoryTab.addItem(str(row[1]), userData=[row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]])
         self.productNameComboBoxEditInventoryTab.currentIndexChanged.connect(self.productNameComboBoxEditInventoryTabCurrentIndexHandler)
         vendors = getAllVendors()
+        self.vendorIdLineEditManageInventoryTab.setText(str(vendors[0][0]))
         for row in vendors:
             self.newVendorNameComboBoxManageInventoryTab.addItem(str(row[1]), userData=[row[0], row[1]])
         self.newVendorNameComboBoxManageInventoryTab.currentIndexChanged.connect(self.newVendorNameComboBoxManageInventoryTabCurrentIndexHandler)
@@ -649,7 +661,7 @@ class MainWindow(QMainWindow):
             self.newProductGenreLineEditManageInventoryTab.setText(row[2])
             self.newProductDeveloperLineEditManageInventoryTab.setText(row[3])
             self.newProductPriceLineEditManageInventoryTab.setText(str(row[5]))
-            self.currentInventoryLineEditManageInventoryTab.setText(str(row[6]))
+            self.quantitySpinBoxManageInventoryTab.setValue(row[6])
         except Exception as e:
             print(e)
 
@@ -661,17 +673,20 @@ class MainWindow(QMainWindow):
             print(e)
 
     def saveChangesButtonManageInventoryTabClickHandler(self):
-        prod_id = self.productIdLineEditManageInventoryTab.text()
-        name = self.newProductNameLineEditManageInventoryTab.text()
-        genre = self.newProductGenreLineEditManageInventoryTab.text()
-        dev = self.newProductDeveloperLineEditManageInventoryTab.text()
-        date = self.newProductReleaseDateManageInventoryTab.date()
-        release_date = f"{date.year()}-{date.month()}-{date.day()}"
-        price = self.newProductPriceLineEditManageInventoryTab.text()
-        vendor = self.vendorIdLineEditManageInventoryTab.text()
-        inventory = self.quantitySpinBoxManageInventoryTab.value()
-        updateProduct(prod_id, name, genre, dev, release_date, price, inventory, vendor)
-        self.refreshProducts()
+        try:
+            prod_id = self.productIdLineEditManageInventoryTab.text()
+            name = self.newProductNameLineEditManageInventoryTab.text()
+            genre = self.newProductGenreLineEditManageInventoryTab.text()
+            dev = self.newProductDeveloperLineEditManageInventoryTab.text()
+            date = self.newProductReleaseDateManageInventoryTab.date()
+            release_date = f"{date.year()}-{date.month()}-{date.day()}"
+            price = self.newProductPriceLineEditManageInventoryTab.text()
+            vendor = self.vendorIdLineEditManageInventoryTab.text()
+            inventory = self.quantitySpinBoxManageInventoryTab.value()
+            updateProduct(prod_id, name, genre, dev, release_date, price, inventory, vendor)
+            self.refreshProducts()
+        except Exception as e:
+            print(e)
 
     def addVendorWidgetSetup(self):
         self.vendorNameLineEditAddVendorTab = self.findChild(QLineEdit, 'vendorNameLineEditAddVendorTab')
@@ -698,6 +713,8 @@ class MainWindow(QMainWindow):
         self.saveChangesButtonEditVendorTab = self.findChild(QPushButton, 'saveChangesButtonEditVendorTab')
         self.saveChangesButtonEditVendorTab.clicked.connect(self.saveChangesButtonEditVendorTabClickHandler)
         vendors = getAllVendors()
+        self.newVendorNameLineEditEditVendorTab.setText(vendors[0][1])
+        self.vendorIdLineEditEditVendorTab.setText(str(vendors[0][0]))
         for row in vendors:
             self.vendorNameComboBoxEditVendorTab.addItem(str(row[1]), userData=[row[0], row[1]])
         self.vendorNameComboBoxEditVendorTab.currentIndexChanged.connect(
@@ -705,8 +722,8 @@ class MainWindow(QMainWindow):
 
     def vendorNameComboBoxEditVendorTabCurrentIndexChangedHandler(self):
         try:
-            vendorId = self.vendorNameComboBoxEditVendorTab.currentData()[0]
-            self.vendorIdLineEditEditVendorTab.setText(str(vendorId))
+            self.newVendorNameLineEditEditVendorTab.setText(self.vendorNameComboBoxEditVendorTab.currentData()[1])
+            self.vendorIdLineEditEditVendorTab.setText(str(self.vendorNameComboBoxEditVendorTab.currentData()[0]))
         except Exception as e:
             print(e)
 
