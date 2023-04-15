@@ -5,12 +5,6 @@ def getCustomerNames():
     rows = execute_and_return(sql)[1]
     return rows
 
-def getProducts():
-    sql = f"CALL `store`.`product_list`();"
-    rows = execute_and_return(sql)[1]
-    names = [row[0:2]+row[5:6] for row in rows]
-    return names
-
 def addCustomer(fname, lname, email, address, phone):
     sql = f"CALL `store`.`add_customer_with_address`('{fname}','{lname}','{email}','{address}','{phone}');"
     execute_and_commit(sql)
@@ -65,8 +59,6 @@ def checkStock(prodId):
     info = execute_and_return(sql)
     return(info[1])
 
-checkStock(3)
-
 def addProduct(prod_name, genre, dev, release, price, vendor_id):
     sql = f"CALL `store`.`add_product`('{prod_name}', '{genre}', '{dev}', '{release}', {price}, 0, {vendor_id});"
     execute_and_commit(sql)
@@ -101,9 +93,21 @@ def getAllCustomers():
     sql = f"CALL `store`.`customer_list`();"
     return execute_and_return(sql)
 
-def getProductss():
+def getRecentCustomers():
+    sql = f"CALL store.recent_customers;"
+    return ExecuteAndReturn(sql)
+
+def getProducts():
     sql = f"CALL `store`.`prod_full_info`();"
     return execute_and_return(sql)[1]
+
+def updateVendor(vendor_id, vendor_name):
+    sql_query = f"CALL store.update_vendor({vendor_id}, '{vendor_name}');"
+    ExecuteAndCommit(sql_query)
+
+def adjustStock(product_id, quantity):
+    sql_query = f"CALL store.adjust_stock({product_id}, '{quantity}');"
+    ExecuteAndCommit(sql_query)
 
 def updateProduct(prod_id, name, genre, dev, date, price, vendor, stock=100):
     sql_query = f"CALL store.update_product({prod_id}, '{name}', '{genre}', '{dev}', '{date}', {price}, {stock}, {vendor})"

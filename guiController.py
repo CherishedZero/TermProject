@@ -69,12 +69,13 @@ class MainWindow(QMainWindow):
         self.emailLineEditNewInvoiceTab.setText(customers[0][2])
         self.idLineEditNewInvoiceTab.setText(str(customers[0][0]))
         games = getProducts()
+        print(games)
         for row in customers:
             self.nameComboBoxNewInvoiceTab.addItem(row[1], userData=[row[0], row[2]])
         self.nameComboBoxNewInvoiceTab.currentIndexChanged.connect(self.nameComboBoxNewInvoiceTabCurrentIndexChangedHandler)
         self.invoiceList = {}
         for game in games:
-            self.productComboBoxNewInvoiceTab.addItem(game[1], userData=[game[0], game[1], game[2]])
+            self.productComboBoxNewInvoiceTab.addItem(game[1], userData=[game[0], game[1], game[5]])
 
     def nameComboBoxNewInvoiceTabCurrentIndexChangedHandler(self):
         """
@@ -631,7 +632,7 @@ class MainWindow(QMainWindow):
         self.currentInventoryLineEditManageInventoryTab = self.findChild(QLineEdit, 'currentInventoryLineEditManageInventoryTab')
         self.saveChangesButtonManageInventoryTab = self.findChild(QPushButton, 'saveChangesButtonManageInventoryTab')
         self.saveChangesButtonManageInventoryTab.clicked.connect(self.saveChangesButtonManageInventoryTabClickHandler)
-        products = getProductss()
+        products = getProducts()
         for row in products:
             self.productNameComboBoxEditInventoryTab.addItem(str(row[1]), userData=[row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]])
         self.productNameComboBoxEditInventoryTab.currentIndexChanged.connect(self.productNameComboBoxEditInventoryTabCurrentIndexHandler)
@@ -647,7 +648,6 @@ class MainWindow(QMainWindow):
             self.newProductNameLineEditManageInventoryTab.setText(row[1])
             self.newProductGenreLineEditManageInventoryTab.setText(row[2])
             self.newProductDeveloperLineEditManageInventoryTab.setText(row[3])
-            # self.newProductReleaseDateManageInventoryTab.setText(row[4])
             self.newProductPriceLineEditManageInventoryTab.setText(str(row[5]))
             self.currentInventoryLineEditManageInventoryTab.setText(str(row[6]))
         except Exception as e:
@@ -665,10 +665,12 @@ class MainWindow(QMainWindow):
         name = self.newProductNameLineEditManageInventoryTab.text()
         genre = self.newProductGenreLineEditManageInventoryTab.text()
         dev = self.newProductDeveloperLineEditManageInventoryTab.text()
-        date = self.newProductReleaseDateManageInventoryTab.text()
+        date = self.newProductReleaseDateManageInventoryTab.date()
+        release_date = f"{date.year()}-{date.month()}-{date.day()}"
         price = self.newProductPriceLineEditManageInventoryTab.text()
         vendor = self.vendorIdLineEditManageInventoryTab.text()
-        updateProduct(prod_id, name, genre, dev, date, price, vendor)
+        inventory = self.quantitySpinBoxManageInventoryTab.value()
+        updateProduct(prod_id, name, genre, dev, release_date, price, inventory, vendor)
         self.refreshProducts()
 
     def addVendorWidgetSetup(self):
@@ -737,10 +739,10 @@ class MainWindow(QMainWindow):
     def refreshProducts(self):
         self.productNameComboBoxEditInventoryTab.clear()
         self.productComboBoxNewInvoiceTab.clear()
-        games = getProductss()
+        games = getProducts()
         for game in games:
             self.productComboBoxNewInvoiceTab.addItem(str(game[1]))
-        products = getProductss()
+        products = getProducts()
         for row in products:
             self.productNameComboBoxEditInventoryTab.addItem(str(row[1]),
                                                              userData=[row[0], row[1], row[2], row[3], row[4], row[5],
@@ -752,92 +754,130 @@ class MainWindow(QMainWindow):
         self.productComboBoxShipmentsTab = self.findChild(QComboBox, 'productComboBoxShipmentsTab')
         self.productSpinBoxShipmentsTab = self.findChild(QSpinBox, 'productSpinBoxShipmentsTab')
         self.addProductButtonShipmentsTab = self.findChild(QPushButton, 'addProductButtonShipmentsTab')
+        self.addProductButtonShipmentsTab.clicked.connect(self.addProductButtonShipmentsTabClickHandler)
         self.removeProductButtonShipmentsTab = self.findChild(QPushButton, 'removeProductButtonShipmentsTab')
+        self.removeProductButtonShipmentsTab.clicked.connect(self.removeProductButtonShipmentsTabClickHandler)
         self.submitButtonShipmentsTab = self.findChild(QPushButton, 'submitButtonShipmentsTab')
+        self.submitButtonShipmentsTab.clicked.connect(self.submitButtonShipmentsTabClickHandler)
         self.randomShipmentButtonShipmentsTab = self.findChild(QPushButton, 'randomShipmentButtonShipmentsTab')
+        self.randomShipmentButtonShipmentsTab.clicked.connect(self.randomShipmentButtonShipmentsTabClickHandler)
         self.shipmentListTableWidgetShipmentsTab = self.findChild(QTableWidget, 'shipmentListTableWidgetShipmentsTab')
         self.feedbackLabelShipmentsTab = self.findChild(QLabel, 'feedbackLabelShipmentsTab')
+        games = getProducts()
+        for row in games:
+            self.productComboBoxShipmentsTab.addItem(row[1], userData=[row[0], row[5]])
+        self.shipmentList = {}
 
+    def addProductButtonShipmentsTabClickHandler(self):
+        try:
+            prodName = self.productComboBoxShipmentsTab.currentText()
+            prodID = self.productComboBoxShipmentsTab.currentData()[0]
+            amount = self.productSpinBoxShipmentsTab.value()
+            if prodID in self.shipmentList.keys():
+                self.shipmentList[prodID][1] += amount
+            else:
+                self.shipmentList[prodID] = [prodName, amount]
+            self.displayShipmentList()
+        except Exception as e:
+            self.feedbackLabelNewInvoiceTab.setText(e)
+
+    def removeProductButtonShipmentsTabClickHandler(self):
+        try:
+            prodID = self.productComboBoxShipmentsTab.currentData()[0]
+            amount = self.productSpinBoxShipmentsTab.value()
+            if prodID in self.shipmentList.keys():
+                self.shipmentList[prodID][1] -= amount
+                if self.shipmentList[prodID][1] <= 0:
+                    del self.shipmentList[prodID]
+            self.displayShipmentList()
+        except Exception as e:
+            self.feedbackLabelNewInvoiceTab.setText(e)
+
+    def displayShipmentList(self):
+        try:
+            self.feedbackLabelShipmentsTab.clear()
+            columns = ["Product ID", "Product Name", "Quantity"]
+            self.shipmentListTableWidgetShipmentsTab.setColumnCount(3)
+            self.shipmentListTableWidgetShipmentsTab.setRowCount(len(self.shipmentList))
+            for i in range(3):
+                self.shipmentListTableWidgetShipmentsTab.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
+            for numRow in range(len(self.shipmentList)):
+                curKey = list(self.shipmentList.keys())[numRow]
+                for numColumn in range(3):
+                    if numColumn == 0:
+                        cellData = QTableWidgetItem(str(curKey))
+                        self.shipmentListTableWidgetShipmentsTab.setItem(numRow, numColumn, cellData)
+                    else:
+                        cellData = QTableWidgetItem(str(self.shipmentList[curKey][numColumn - 1]))
+                        self.shipmentListTableWidgetShipmentsTab.setItem(numRow, numColumn, cellData)
+        except Exception as e:
+            print(e)
+
+    def submitButtonShipmentsTabClickHandler(self):
+        try:
+            for productID, productInfo in self.shipmentList.items():
+                adjustStock(productID, productInfo[1])
+            self.shipmentList = {}
+            self.displayShipmentList()
+            self.refreshProductTables()
+            self.feedbackLabelShipmentsTab.setText("Shipment Received!")
+        except Exception as e:
+            print(e)
+
+    def randomShipmentButtonShipmentsTabClickHandler(self):
+        try:
+            product_list = getProducts()
+            attempts = randint(1, len(product_list) * randint(1, 2))
+            for products in range(attempts):
+                list_id = randint(0, len(product_list) - 1)
+                product_id = list_id + 1
+                if product_id in self.shipmentList.keys():
+                    self.shipmentList[product_id][1] += randint(1, 200)
+                else:
+                    self.shipmentList[product_id] = [product_list[list_id][1], randint(1, 200)]
+            self.displayShipmentList()
+        except Exception as e:
+            print(e)
     def viewWidgetSetup(self):
         self.viewSelectionComboBoxViewTab = self.findChild(QComboBox, 'viewSelectionComboBoxViewTab')
         self.viewTableWidgetViewTab = self.findChild(QTableWidget, 'viewTableWidgetViewTab')
+        self.viewResetToDefault()
+        self.viewSelectionComboBoxViewTab.currentIndexChanged.connect(
+            self.viewSelectionComboBoxViewTabCurrentIndexChangedHandler)
+
+    def viewResetToDefault(self):
         colNames, data = getAllInventory()
-        self.displayInventoryInTable(colNames, data, self.viewTableWidgetViewTab)
-        self.viewSelectionComboBoxViewTab.currentIndexChanged.connect(self.viewSelectionComboBoxViewTabCurrentIndexChangedHandler)
+        self.displayInView(colNames, data)
 
     def viewSelectionComboBoxViewTabCurrentIndexChangedHandler(self):
         self.viewTableWidgetViewTab.clear()
         currently = self.viewSelectionComboBoxViewTab.currentText()
         if currently == 'Inventory':
             colNames, data = getAllInventory()
-            self.displayInventoryInTable(colNames, data, self.viewTableWidgetViewTab)
         elif currently == 'Out Of Stock':
             colNames, data = outOfStock()
-            self.displayOutOfStockInTable(colNames, data, self.viewTableWidgetViewTab)
         elif currently == 'Vendors':
             colNames, data = getAllVendorsForTable()
-            self.displayVendorsInTable(colNames, data, self.viewTableWidgetViewTab)
         elif currently == 'Customers':
             colNames, data = getAllCustomers()
-            self.displayCustomersInTable(colNames, data, self.viewTableWidgetViewTab)
+        elif currently == 'Recent Customers':
+            colNames, data = getRecentCustomers()
+        self.displayInView(colNames, data)
 
     def refreshProductTables(self):
         self.viewTableWidgetViewTab.clear()
+        self.viewResetToDefault()
 
-    def displayInventoryInTable(self, columns, rows, table:QTableWidget):
+    def displayInView(self, columns, rows):
         try:
-            table.setRowCount(len(rows))
-            table.setColumnCount(len(columns))
+            self.viewTableWidgetViewTab.setRowCount(len(rows))
+            self.viewTableWidgetViewTab.setColumnCount(len(columns))
             for i in range(len(rows)):
                 row = rows[i]
                 for j in range(len(row)):
-                    table.setItem(i, j, QTableWidgetItem(str(row[j])))
-            columns = ['ID', 'Name', 'Genre', 'Developer', 'Release Date', 'Price', 'Stock', 'Publisher']
-            for i in range(table.columnCount()):
-                table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
-        except Exception as e:
-            print(e)
-
-
-    def displayOutOfStockInTable(self, columns, rows, table:QTableWidget):
-        try:
-            table.setRowCount(len(rows))
-            table.setColumnCount(len(columns))
-            for i in range(len(rows)):
-                row = rows[i]
-                for j in range(len(row)):
-                    table.setItem(i, j, QTableWidgetItem(str(row[j])))
-            columns = ['ID', 'Name', 'Genre', 'Developer', 'Release Date', 'Price', 'Stock', 'Publisher']
-            for i in range(table.columnCount()):
-                table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
-        except Exception as e:
-            print(e)
-
-    def displayVendorsInTable(self, columns, rows, table:QTableWidget):
-        try:
-            table.setRowCount(len(rows))
-            table.setColumnCount(len(columns))
-            for i in range(len(rows)):
-                row = rows[i]
-                for j in range(len(row)):
-                    table.setItem(i, j, QTableWidgetItem(str(row[j])))
-            columns = ['ID', 'Name']
-            for i in range(table.columnCount()):
-                table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
-        except Exception as e:
-            print(e)
-
-    def displayCustomersInTable(self, columns, rows, table:QTableWidget):
-        try:
-            table.setRowCount(len(rows))
-            table.setColumnCount(len(columns))
-            for i in range(len(rows)):
-                row = rows[i]
-                for j in range(len(row)):
-                    table.setItem(i, j, QTableWidgetItem(str(row[j])))
-            columns = ['ID', 'Name', 'Email', 'Home Address', 'Phone Number']
-            for i in range(table.columnCount()):
-                table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
+                    self.viewTableWidgetViewTab.setItem(i, j, QTableWidgetItem(str(row[j])))
+            for i in range(self.viewTableWidgetViewTab.columnCount()):
+                self.viewTableWidgetViewTab.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
         except Exception as e:
             print(e)
 
