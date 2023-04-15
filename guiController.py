@@ -23,10 +23,35 @@ class MainWindow(QMainWindow):
         self.editVendorWidgetSetup()
         self.shipmentWidgetSetup()
         self.viewWidgetSetup()
-        self.items = {}
-        self.table_key = {}
 
     def newInvoiceWidgetSetup(self):
+        """
+            Sets up the widgets and connections for the new invoice tab.
+
+            Initializes and assigns values to several widgets including:
+                - nameComboBoxNewInvoiceTab: a combobox for selecting a customer's name
+                - emailLineEditNewInvoiceTab: a line edit for displaying a customer's email
+                - idLineEditNewInvoiceTab: a line edit for displaying a customer's id
+                - productComboBoxNewInvoiceTab: a combobox for selecting a product
+                - productNumberSpinBoxNewInvoiceTab: a spin box for selecting the number of products to purchase
+                - invoiceTotalLineEditNewInvoiceTab: a line edit for displaying the total cost of the invoice
+                - invoiceListTableWidgetNewInvoiceTab: a table widget for displaying the items in the invoice
+                - feedbackLabelNewInvoiceTab: a label for displaying feedback to the user
+                - addProductButtonNewInvoiceTab: a button for adding a product to the invoice list
+                - removeProductButtonNewInvoiceTab: a button for removing a product from the invoice list
+                - purchaseButtonNewInvoiceTab: a button for finalizing the purchase and creating the invoice
+
+            Sets up the initial values for the nameComboBoxNewInvoiceTab, emailLineEditNewInvoiceTab, and idLineEditNewInvoiceTab
+            by getting the list of customers and selecting the first one by default. Sets up the initial values for the
+            productComboBoxNewInvoiceTab by getting the list of products.
+
+            Connects several signals to slots including:
+                - addProductButtonNewInvoiceTab.clicked: connects to addProductButtonNewInvoiceTabClickHandler
+                - removeProductButtonNewInvoiceTab.clicked: connects to removeProductButtonNewInvoiceTabClickHandler
+                - purchaseButtonNewInvoiceTab.clicked: connects to purchaseButtonNewInvoiceTabClickHandler
+
+        """
+        self.table_dict = {}
         self.nameComboBoxNewInvoiceTab = self.findChild(QComboBox, 'nameComboBoxNewInvoiceTab')
         self.emailLineEditNewInvoiceTab = self.findChild(QLineEdit, 'emailLineEditNewInvoiceTab')
         self.idLineEditNewInvoiceTab = self.findChild(QLineEdit, 'idLineEditNewInvoiceTab')
@@ -48,12 +73,15 @@ class MainWindow(QMainWindow):
         for row in customers:
             self.nameComboBoxNewInvoiceTab.addItem(row[1], userData=[row[0], row[2]])
         self.nameComboBoxNewInvoiceTab.currentIndexChanged.connect(self.nameComboBoxNewInvoiceTabCurrentIndexChangedHandler)
+        self.invoiceList = {}
         for game in games:
-            self.productComboBoxNewInvoiceTab.addItem(str(game[1]))
-
-
+            self.productComboBoxNewInvoiceTab.addItem(game[1], userData=[game[0], game[1], game[5]])
 
     def nameComboBoxNewInvoiceTabCurrentIndexChangedHandler(self):
+        """
+            Handles the currentIndexChanged event of the nameComboBoxNewInvoiceTab ComboBox in the New Invoice tab.
+            Updates the email address and customer ID line edits when the user selects a different customer name from the ComboBox.
+        """
         try:
             customerId = self.nameComboBoxNewInvoiceTab.currentData()[0]
             customerEmail = self.nameComboBoxNewInvoiceTab.currentData()[1]
@@ -63,83 +91,105 @@ class MainWindow(QMainWindow):
             self.feedbackLabelNewInvoiceTab.setText(str(e))
 
     def addProductButtonNewInvoiceTabClickHandler(self):
+        """
+            Add a new product to the invoice list when the "Add Product" button is clicked.
+
+            Retrieves the selected product name, ID, price, and quantity from the corresponding widgets in the
+            new invoice tab. If the product is already in the invoice list, its quantity is updated; otherwise,
+            a new entry is added to the invoice list. Then, the updated invoice list is displayed in the table
+            widget.
+
+            Raises:
+                Exception: If any error occurs while retrieving or updating the product information.
+
+        """
         try:
             prodName = self.productComboBoxNewInvoiceTab.currentText()
-            colNames, info = getGameInfoByName(prodName)
-            self.displayGameInfoInTable(colNames, [info], self.invoiceListTableWidgetNewInvoiceTab)
-            self.getTotal()
-        except Exception as e:
-            self.feedbackLabelNewInvoiceTab.setText(e)
-
-    def displayGameInfoInTable(self, columns, rows, table:QTableWidget):
-        try:
-            num_rows = table.rowCount()
-            table.setColumnCount(len(columns))
+            prodID = self.productComboBoxNewInvoiceTab.currentData()[0]
+            prodPrice = self.productComboBoxNewInvoiceTab.currentData()[2]
             quantity = self.productNumberSpinBoxNewInvoiceTab.value()
-            for row in rows:
-                keys = list(row.keys())
-                values = list(row.values())
-                item_key = values[0]
-                item_info = {keys[1]: values[1], keys[2]: values[2]}
-                self.items = row
-                if item_key in self.table_key:
-                    self.table_key[item_key]['quantity'] += quantity
-                    current_price = self.table_key[item_key]['price']
-                    updated_price = round(current_price * self.table_key[item_key]['quantity'], 2)
-                    for i in range(num_rows):
-                        if table.item(i, 0).text() == str(item_key):
-                            row_index = i
-                            break
-                    current_quantity = int(table.item(row_index, 2).text())
-                    new_quantity = quantity + current_quantity
-                    table.item(row_index, 2).setText(str(new_quantity))
-                    table.item(row_index, 3).setText(str(updated_price))
-                else:
-                    self.table_key[item_key] = {'prod_name': item_info['prod_name'], 'price': item_info['price'], 'quantity': quantity}
-                    table.setRowCount(num_rows + 1)
-                    i = num_rows
-                    item_row = []
-                    for j in range(len(columns)):
-                        if j == 0:
-                            item = QTableWidgetItem(str(row['prod_id']))
-                        elif j == 1:
-                            item = QTableWidgetItem(row['prod_name'])
-                        elif j == 2:
-                            item = QTableWidgetItem(str(quantity))
-                        elif j == 3:
-                            base_price = float(self.items['price'])
-                            modified_price = base_price * quantity
-                            item = QTableWidgetItem(str(round(modified_price,2)))
-                        item_row.append(item)
-                        table.setItem(i, j, item)
-            for i in range(table.columnCount()):
-                table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
+            if prodID in self.invoiceList.keys():
+                self.invoiceList[prodID][1] += quantity
+            else:
+                self.invoiceList[prodID] = [prodName, quantity, prodPrice]
+            self.displayGameInfoInTable()
         except Exception as e:
-            self.feedbackLabelNewInvoiceTab.setText(e)
+            self.feedbackLabelNewInvoiceTab.setText(str(e))
+
+
+    def displayGameInfoInTable(self):
+        """
+            Update the invoice list table with the information about the games being added to the invoice.
+            The method retrieves the data from the `self.invoiceList` dictionary and sets the data in the
+            `self.invoiceListTableWidgetNewInvoiceTab` table widget.
+
+            Raises:
+                Exception: If an error occurs while setting the data in the table widget.
+
+        """
+        try:
+            colNames = ['ID', 'Game', 'Quantity', 'Price($)']
+            self.invoiceListTableWidgetNewInvoiceTab.setColumnCount(4)
+            self.invoiceListTableWidgetNewInvoiceTab.setRowCount(len(self.invoiceList))
+            for i in range(4):
+                self.invoiceListTableWidgetNewInvoiceTab.setHorizontalHeaderItem(i, QTableWidgetItem(f"{colNames[i]}"))
+            for numRow in range(len(self.invoiceList)):
+                key = list(self.invoiceList.keys())[numRow]
+                for numColumn in range(4):
+                    if numColumn == 0:
+                        cellData = QTableWidgetItem(str(key))
+                        self.invoiceListTableWidgetNewInvoiceTab.setItem(numRow, numColumn, cellData)
+                    elif numColumn == 1:
+                        cellData = QTableWidgetItem(str(self.invoiceList[key][0]))
+                        self.invoiceListTableWidgetNewInvoiceTab.setItem(numRow, numColumn, cellData)
+                    elif numColumn == 2:
+                        cellData = QTableWidgetItem(str(self.invoiceList[key][1]))
+                        self.invoiceListTableWidgetNewInvoiceTab.setItem(numRow, numColumn, cellData)
+                    else:
+                        cellData = QTableWidgetItem(str(float(self.invoiceList[key][2]) * float(self.invoiceList[key][1])))
+                        self.invoiceListTableWidgetNewInvoiceTab.setItem(numRow, numColumn, cellData)
+                        self.getTotal()
+        except Exception as e:
+            print(e)
 
     def removeProductButtonNewInvoiceTabClickHandler(self):
+        """
+                Removes the selected product from the invoice list in the new invoice tab.
+                The method first retrieves the product ID and quantity from the corresponding
+                widgets. If the product ID is found in the invoice list, the method decrements
+                the product quantity by the selected quantity. If the resulting quantity is
+                zero or negative, the method removes the product from the invoice list. Finally,
+                the method updates the invoice list table widget by calling the displayGameInfoInTable
+                method.
+
+                Raises:
+                    Exception: If an error occurs while retrieving or updating the data in the
+                               widgets, the error message is displayed in the feedback label widget.
+        """
         try:
-            selected_row = self.invoiceListTableWidgetNewInvoiceTab.currentRow()
+            prodID = self.productComboBoxNewInvoiceTab.currentData()[0]
             quantity = self.productNumberSpinBoxNewInvoiceTab.value()
-            if selected_row >= 0:
-                prod_id = int(self.invoiceListTableWidgetNewInvoiceTab.item(selected_row, 0).text())
-                current_quantity = int(self.invoiceListTableWidgetNewInvoiceTab.item(selected_row, 2).text())
-                if current_quantity > quantity:
-                    current_price = float(self.invoiceListTableWidgetNewInvoiceTab.item(selected_row, 3).text())
-                    base_price = current_price / current_quantity
-                    new_quantity = current_quantity - quantity
-                    new_price = round(base_price * new_quantity, 2)
-                    self.invoiceListTableWidgetNewInvoiceTab.item(selected_row, 2).setText(str(new_quantity))
-                    self.invoiceListTableWidgetNewInvoiceTab.item(selected_row, 3).setText(str(new_price))
-                    self.getTotal()
-                else:
-                    self.invoiceListTableWidgetNewInvoiceTab.removeRow(selected_row)
-                    del self.table_key[prod_id]
-                    self.getTotal()
+            if prodID in self.invoiceList.keys():
+                self.invoiceList[prodID][1] -= quantity
+                if self.invoiceList[prodID][1] <= 0:
+                    del self.invoiceList[prodID]
+            self.displayGameInfoInTable()
         except Exception as e:
             self.feedbackLabelNewInvoiceTab.setText(e)
 
+
     def getTotal(self):
+        """
+            Calculates and displays the total price of all products in the invoice table.
+
+            This method loops through all the rows in the invoice table and extracts the
+            price and quantity of each product. It then calculates the total price of all
+            the products and displays it in the invoice total line edit field.
+
+            Raises:
+                Exception: If there is an error while calculating the total price or updating
+                    the invoice total line edit field.
+        """
         try:
             total = 0.0
             for row in range(self.invoiceListTableWidgetNewInvoiceTab.rowCount()):
@@ -156,22 +206,67 @@ class MainWindow(QMainWindow):
             self.feedbackLabelNewInvoiceTab.setText(e)
 
     def purchaseButtonNewInvoiceTabClickHandler(self):
-        cust_id = int(self.idLineEditNewInvoiceTab.text())
-        for row in range(self.invoiceListTableWidgetNewInvoiceTab.rowCount()):
+        """
+            Handle the click of the 'Purchase' button on the 'New Invoice' tab.
+
+            Loop through the invoiceList and check the stock quantity of each product against the quantity requested.
+            If there is insufficient stock, set feedbackLabelNewInvoiceTab to an error message and break the loop.
+            If all products have sufficient stock, create a new invoice, update the UI, and clear the invoiceList.
+        """
+        break_condition = False
+        for key, value in self.invoiceList.items():
             try:
-                prod_id = int(self.invoiceListTableWidgetNewInvoiceTab.item(row, 0).text())
-                quantity = int(self.invoiceListTableWidgetNewInvoiceTab.item(row, 2).text())
-                if quantity - checkStock(prod_id)[0][0] > 0:
-                    self.feedbackLabelNewInvoiceTab.setText(f'The Quantity of {self.productComboBoxNewInvoiceTab.currentText()}\n would be below 0 if purchase was completed')
-                else:
-                    createInvoice(cust_id, prod_id, quantity)
-                    self.invoiceListTableWidgetNewInvoiceTab.setRowCount(0)
-                    self.refreshProductTables()
+                prod_id = int(key)
+                prod_name = value[0]
+                quantity = value[1]
+                stocked = checkStock(prod_id)
+                if stocked[0][0] - quantity < 0:
+                    self.feedbackLabelNewInvoiceTab.setText(f'The quantity of {prod_name}\n is {stocked[0][0]}. Please remove some.')
+                    break_condition = True
+                    break
             except Exception as e:
-                self.feedbackLabelNewInvoiceTab.setText(e)
-        self.getTotal()
+                print(e)
+        if not break_condition:
+            createInvoice(self.idLineEditNewInvoiceTab.text(), self.invoiceList)
+            self.invoiceListTableWidgetNewInvoiceTab.clearContents()
+            self.invoiceListTableWidgetNewInvoiceTab.setRowCount(0)
+            self.refreshProductTables()
+            self.invoiceList.clear()
+            self.refreshInvoiceTab()
+            self.getTotal()
+            self.table_dict.clear()
+
+    def refreshInvoiceTab(self):
+        """
+            Reset the invoice tab to its initial state.
+
+            This function resets the customer and product combo boxes, and clears the product quantity spin box. It is
+            intended to be called when the user wants to start a new invoice.
+
+        """
+        self.nameComboBoxNewInvoiceTab.setCurrentIndex(0)
+        self.productComboBoxNewInvoiceTab.setCurrentIndex(0)
+        self.productNumberSpinBoxNewInvoiceTab.clear()
 
     def addCustomerWidgetSetup(self):
+        """
+            Sets up the widgets and connections for the Add Customer tab.
+
+            Initializes and assigns values to several widgets including:
+            - firstNameLineEditAddCustomerTab: a line edit for entering the customer's first name
+            - lastNameLineEditAddCustomerTab: a line edit for entering the customer's last name
+            - emailLineEditAddCustomerTab: a line edit for entering the customer's email
+            - addressLineEditAddCustomerTab: a line edit for entering the customer's address
+            - phoneLineEditAddCustomerTab: a line edit for entering the customer's phone number
+            - feedbackLabelAddCustomerTab: a label for displaying feedback to the user
+            - addCustomerButtonAddCustomerTab: a button for adding the customer to the database
+
+            Connects the addCustomerButtonAddCustomerTab.clicked signal to the
+            addCustomerButtonAddCustomerTabClickHandler slot.
+
+            Returns:
+                None
+        """
         self.firstNameLineEditAddCustomerTab = self.findChild(QLineEdit, 'firstNameLineEditAddCustomerTab')
         self.lastNameLineEditAddCustomerTab = self.findChild(QLineEdit, 'lastNameLineEditAddCustomerTab')
         self.emailLineEditAddCustomerTab = self.findChild(QLineEdit, 'emailLineEditAddCustomerTab')
@@ -182,6 +277,20 @@ class MainWindow(QMainWindow):
         self.addCustomerButtonAddCustomerTab.clicked.connect(self.addCustomerButtonAddCustomerTabClickHandler)
 
     def addCustomerButtonAddCustomerTabClickHandler(self):
+        """
+            Handles the click of the add customer button in the add customer tab.
+
+            Gets the input values from the various QLineEdit fields in the add customer tab and
+            passes them to the addCustomer function which attempts to add the customer to the database.
+            If successful, the add customer, edit customer, and new invoice tabs are refreshed and the
+            add customer fields are cleared.
+
+            If the address field is left blank, the addCustomerNoAddress function is called instead.
+
+            If an exception is raised during the addCustomer function call or the input fields are
+            not properly filled, an error message is displayed in the feedbackLabelAddCustomerTab.
+
+        """
         try:
             fname = self.firstNameLineEditAddCustomerTab.text()
             lname = self.lastNameLineEditAddCustomerTab.text()
@@ -203,6 +312,20 @@ class MainWindow(QMainWindow):
             self.feedbackLabelAddCustomerTab.setText(str(e))
 
     def clearAddCustomerFields(self):
+        """
+          Clears the input fields in the "Add Customer" tab and sets a feedback message to indicate that
+          the customer has been successfully added to the database.
+
+          Clears the following fields:
+             - firstNameLineEditAddCustomerTab
+             - lastNameLineEditAddCustomerTab
+             - emailLineEditAddCustomerTab
+             - addressLineEditAddCustomerTab
+             - phoneLineEditAddCustomerTab
+
+            Sets the feedbackLabelAddCustomerTab to display a success message, including the first name of the
+            customer that was just added.
+        """
         self.feedbackLabelAddCustomerTab.setText(f"{self.firstNameLineEditAddCustomerTab.text()} successfully added to customer database")
         self.firstNameLineEditAddCustomerTab.clear()
         self.lastNameLineEditAddCustomerTab.clear()
@@ -211,6 +334,28 @@ class MainWindow(QMainWindow):
         self.phoneLineEditAddCustomerTab.clear()
 
     def editCustomerWidgetSetup(self):
+        """
+        Sets up the widgets and connections for the edit customer tab.
+
+        Initializes and assigns values to several widgets including:
+            - nameComboBoxEditCustomerTab: a combobox for selecting a customer to edit
+            - idNameLineEditEditCustomerTab: a line edit for displaying a customer's id
+            - emailLineEditEditCustomerTab: a line edit for displaying/editing a customer's email
+            - addressLineEditEditCustomerTab: a line edit for displaying/editing a customer's address
+            - phoneLineEditEditCustomerTab: a line edit for displaying/editing a customer's phone number
+            - firstNameLineEditCustomerTab: a line edit for displaying/editing a customer's first name
+            - lastNameLineEditEditCustomerTab: a line edit for displaying/editing a customer's last name
+            - feedbackLabelEditCustomerTab: a label for displaying feedback to the user
+            - saveChangesButton: a button for saving changes made to the customer's information
+
+        Sets up the initial values for the widgets by getting the first customer in the list of customers and
+        populating the combobox with all customers.
+
+        Connects the saveChangesButton.clicked signal to the saveChangesButtonClickHandler method.
+        Connects the nameComboBoxEditCustomerTab.currentIndexChanged signal to the
+        idComboBoxEditCustomerTabCurrentIndexChangedHandler method.
+
+        """
         self.nameComboBoxEditCustomerTab = self.findChild(QComboBox, 'nameComboBoxEditCustomerTab')
         self.idNameLineEditEditCustomerTab = self.findChild(QLineEdit, 'idNameLineEditEditCustomerTab')
         self.emailLineEditEditCustomerTab = self.findChild(QLineEdit, 'emailLineEditEditCustomerTab')
@@ -233,6 +378,17 @@ class MainWindow(QMainWindow):
         self.nameComboBoxEditCustomerTab.currentIndexChanged.connect(self.idComboBoxEditCustomerTabCurrentIndexChangedHandler)
 
     def idComboBoxEditCustomerTabCurrentIndexChangedHandler(self):
+        """
+            Handler for when the index of the nameComboBoxEditCustomerTab is changed.
+            Updates the values of several QLineEdit widgets based on the current selection in the nameComboBoxEditCustomerTab.
+            If the currentData of the nameComboBoxEditCustomerTab is None, clears the values of the idNameLineEditEditCustomerTab,
+            firstNameLineEditCustomerTab, lastNameLineEditEditCustomerTab, emailLineEditEditCustomerTab, addressLineEditEditCustomerTab,
+            and phoneLineEditEditCustomerTab. Otherwise, sets the values of these QLineEdit widgets based on the corresponding
+            data from the currentData of the nameComboBoxEditCustomerTab.
+
+            If an exception occurs, sets the text of the feedbackLabelEditCustomerTab and feedbackLabelAddCustomerTab to the error message.
+
+        """
         try:
             row = self.nameComboBoxEditCustomerTab.currentData()
             if row is None:
@@ -254,6 +410,19 @@ class MainWindow(QMainWindow):
             self.feedbackLabelAddCustomerTab.setText(str(e))
 
     def saveChangesButtonClickHandler(self):
+        """
+        Handles the "Save Changes" button click event for the Edit Customer tab.
+
+        Attempts to save the changes made to the customer's information by retrieving the input values from the respective
+        widgets. Validates that the required fields (first name, last name, email, and phone) are not empty. If the address is
+        empty, calls the 'updateCustomerInfoBlankAddress' function, which updates the customer's information without an address.
+        Otherwise, calls the 'updateCustomerInfo' function, which updates the customer's information with the provided address.
+
+        Clears the input fields for both the Edit Customer and New Invoice tabs, refreshes the customer comboboxes, and updates
+        the feedback label with any error messages.
+
+        """
+
         try:
             id = self.idNameLineEditEditCustomerTab.text()
             email = self.emailLineEditEditCustomerTab.text()
@@ -275,6 +444,17 @@ class MainWindow(QMainWindow):
             self.feedbackLabelEditCustomerTab.setText(str(e))
 
     def editCustomerClear(self):
+        """
+            This method clears the input fields in the Edit Customer tab after successfully editing customer information.
+
+            It clears the nameComboBoxEditCustomerTab, idNameLineEditEditCustomerTab, emailLineEditEditCustomerTab,
+            addressLineEditEditCustomerTab, phoneLineEditEditCustomerTab, firstNameLineEditCustomerTab,
+            and lastNameLineEditEditCustomerTab.
+
+            It also sets the feedback label in the Edit Customer tab to indicate that customer information has been
+            successfully edited.
+
+        """
         self.feedbackLabelEditCustomerTab.setText(f"Customer information successfully edited")
         self.nameComboBoxEditCustomerTab.clear()
         self.idNameLineEditEditCustomerTab.clear()
@@ -285,12 +465,24 @@ class MainWindow(QMainWindow):
         self.lastNameLineEditEditCustomerTab.clear()
 
     def invoiceCustomerClear(self):
+        """
+            Clears the invoice customer information by resetting the values of the following widgets:
+            - emailLineEditNewInvoiceTab: a line edit for displaying a customer's email
+            - idLineEditNewInvoiceTab: a line edit for displaying a customer's id
+            - nameComboBoxNewInvoiceTab: a combobox for selecting a customer's name
+        """
         self.emailLineEditNewInvoiceTab.clear()
         self.idLineEditNewInvoiceTab.clear()
         self.nameComboBoxNewInvoiceTab.clear()
 
 
     def refreshCustomersComboBoxes(self):
+        """
+        Refreshes the customer combo boxes by fetching the customer information from the database and updating the
+        appropriate combo boxes with the retrieved information. Also connects the appropriate signals to the
+        corresponding slots.
+        """
+
         self.refreshProductTables()
         try:
             customers = getCustomer()
@@ -306,6 +498,27 @@ class MainWindow(QMainWindow):
             self.feedbackLabelEditCustomerTab.setText(e)
 
     def addProductWidgetSetup(self):
+        """
+            Sets up the widgets and connections for the add product tab.
+
+            Initializes and assigns values to several widgets including:
+                - productNameLineEditAddProductTab: a line edit for entering the name of the product
+                - productGenreLineEditAddProductTab: a line edit for entering the genre of the product
+                - productDeveloperLineEditAddProductTab: a line edit for entering the developer of the product
+                - productReleaseDateAddProductTab: a date edit for entering the release date of the product
+                - productPriceLineEditAddProductTab: a line edit for entering the price of the product
+                - vendorNameComboBoxAddProductTab: a combobox for selecting the vendor name of the product
+                - vendorIdLineEditAddProductTab: a line edit for displaying the ID of the vendor
+                - feedbackLabelAddProductTab: a label for displaying feedback to the user
+                - addProductButtonAddProductTab: a button for adding a product to the database
+
+            Sets up the initial values for the vendorNameComboBoxAddProductTab by getting the list of vendors.
+
+            Connects the addProductButtonAddProductTab.clicked signal to addProductButtonAddProductTabClickHandler.
+
+            Returns:
+                None
+            """
         self.productNameLineEditAddProductTab = self.findChild(QLineEdit, 'productNameLineEditAddProductTab')
         self.productGenreLineEditAddProductTab = self.findChild(QLineEdit, 'productGenreLineEditAddProductTab')
         self.productDeveloperLineEditAddProductTab = self.findChild(QLineEdit, 'productDeveloperLineEditAddProductTab')
@@ -313,7 +526,7 @@ class MainWindow(QMainWindow):
         self.productPriceLineEditAddProductTab = self.findChild(QLineEdit, 'productPriceLineEditAddProductTab')
         self.vendorNameComboBoxAddProductTab = self.findChild(QComboBox, 'vendorNameComboBoxAddProductTab')
         self.vendorIdLineEditAddProductTab = self.findChild(QLineEdit, 'vendorIdLineEditAddProductTab')
-        self.feedbackLabelAddProductTab = self.findChild(QLineEdit, 'feedbackLabelAddProductTab')
+        self.feedbackLabelAddProductTab = self.findChild(QLabel, 'feedbackLabelAddProductTab')
         self.addProductButtonAddProductTab = self.findChild(QPushButton, 'addProductButtonAddProductTab')
         self.addProductButtonAddProductTab.clicked.connect(self.addProductButtonAddProductTabClickHandler)
         vendors = getAllVendors()
@@ -322,6 +535,12 @@ class MainWindow(QMainWindow):
         self.vendorNameComboBoxAddProductTab.currentIndexChanged.connect(self.vendorNameComboBoxAddProductTabCurrentIndexChangedHandler)
 
     def vendorNameComboBoxAddProductTabCurrentIndexChangedHandler(self):
+        """
+            Event handler for the vendorNameComboBoxAddProductTab combobox's currentIndexChanged signal.
+
+            Gets the selected vendor's id from the combobox's userData and sets it to the vendorIdLineEditAddProductTab line edit.
+
+            """
         try:
             vendorId = self.vendorNameComboBoxAddProductTab.currentData()[0]
             self.vendorIdLineEditAddProductTab.setText(str(vendorId))
@@ -329,6 +548,18 @@ class MainWindow(QMainWindow):
             print(e)
 
     def addProductButtonAddProductTabClickHandler(self):
+        """
+            Handles the event when the user clicks the 'Add Product' button in the 'Add Product' tab.
+
+            Retrieves the values of the product name, genre, developer, release date, price, and vendor ID from their respective
+            widgets in the UI. Converts the price to a float, and then checks that all fields are non-empty. If any of these
+            operations fail, the error message is displayed in the feedback label.
+
+            If all fields are valid, the `addProduct` function is called with the retrieved values, and a success message is
+            displayed in the feedback label. The 'Add Product' tab is then cleared, and the list of products in the 'View
+            Products' tab is refreshed.
+
+        """
         try:
             prod_name = self.productNameLineEditAddProductTab.text()
             genre = self.productGenreLineEditAddProductTab.text()
@@ -343,9 +574,30 @@ class MainWindow(QMainWindow):
             assert all(field != '' for field in [prod_name, genre, dev, release, price_float, vendor_id])
 
             addProduct(prod_name, genre, dev, release, float(price), int(vendor_id))
+            self.feedbackLabelAddProductTab.setText(f"{prod_name} successfully added")
+            self.clearAddProducts()
             self.refreshProducts()
         except Exception as e:
+            print(str(e))
             self.feedbackLabelAddProductTab.setText(str(e))
+
+    def clearAddProducts(self):
+        """
+            Clears the text fields in the Add Product tab.
+
+            Clears the following text fields:
+                - productNameLineEditAddProductTab
+                - productGenreLineEditAddProductTab
+                - productDeveloperLineEditAddProductTab
+                - productPriceLineEditAddProductTab
+
+        """
+        self.productNameLineEditAddProductTab.clear()
+        self.productGenreLineEditAddProductTab.clear()
+        self.productDeveloperLineEditAddProductTab.clear()
+        self.productPriceLineEditAddProductTab.clear()
+##########################################################################################################################
+
 
     def manageInventoryWidgetSetup(self):
         self.productNameComboBoxEditInventoryTab = self.findChild(QComboBox, 'productNameComboBoxEditInventoryTab')
@@ -413,6 +665,8 @@ class MainWindow(QMainWindow):
             assert vendor_name != '', 'Name cannot be empty'
             addVendor(vendor_name)
             self.refreshVendors()
+            self.feedbackLabelAddVendorTab.setText(f"{vendor_name} successfully added")
+            self.vendorNameLineEditAddVendorTab.clear()
         except Exception as e:
             self.feedbackLabelAddVendorTab.setText(e)
 
@@ -420,6 +674,7 @@ class MainWindow(QMainWindow):
         self.vendorNameComboBoxEditVendorTab = self.findChild(QComboBox, 'vendorNameComboBoxEditVendorTab')
         self.newVendorNameLineEditEditVendorTab = self.findChild(QLineEdit, 'newVendorNameLineEditEditVendorTab')
         self.vendorIdLineEditEditVendorTab = self.findChild(QLineEdit, 'vendorIdLineEditEditVendorTab')
+        self.feedbackLabelEditVendorTab = self.findChild(QLabel, 'feedbackLabelEditVendorTab')
         self.saveChangesButtonEditVendorTab = self.findChild(QPushButton, 'saveChangesButtonEditVendorTab')
         self.saveChangesButtonEditVendorTab.clicked.connect(self.saveChangesButtonEditVendorTabClickHandler)
         vendors = getAllVendors()
@@ -439,6 +694,7 @@ class MainWindow(QMainWindow):
         vendor_name = self.newVendorNameLineEditEditVendorTab.text()
         vendor_id = int(self.vendorIdLineEditEditVendorTab.text())
         updateVendor(vendor_id, vendor_name)
+        self.feedbackLabelEditVendorTab.setText(f"{vendor_name} successfully edited")
         self.refreshVendors()
 
     def refreshVendors(self):
@@ -463,11 +719,9 @@ class MainWindow(QMainWindow):
     def refreshProducts(self):
         self.productNameComboBoxEditInventoryTab.clear()
         self.productComboBoxNewInvoiceTab.clear()
-        games = getProducts()
-        for game in games:
-            self.productComboBoxNewInvoiceTab.addItem(str(game[1]))
         products = getProducts()
         for row in products:
+            self.productComboBoxNewInvoiceTab.addItem(str(row[1]))
             self.productNameComboBoxEditInventoryTab.addItem(str(row[1]),
                                                              userData=[row[0], row[1], row[2], row[3], row[4], row[5],
                                                                        row[6], row[7]])
