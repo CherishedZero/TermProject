@@ -174,6 +174,7 @@ class MainWindow(QMainWindow):
                 if self.invoiceList[prodID][1] <= 0:
                     del self.invoiceList[prodID]
             self.displayGameInfoInTable()
+            self.getTotal()
         except Exception as e:
             self.feedbackLabelNewInvoiceTab.setText(e)
 
@@ -221,7 +222,7 @@ class MainWindow(QMainWindow):
                 quantity = value[1]
                 stocked = checkStock(prod_id)
                 if stocked[0][0] - quantity < 0:
-                    self.feedbackLabelNewInvoiceTab.setText(f'The quantity of {prod_name}\n is {stocked[0][0]}. Please remove some.')
+                    self.feedbackLabelNewInvoiceTab.setText(f'Only {stocked[0][0]} of {prod_name}\n are in stock. Please adjust order.')
                     break_condition = True
                     break
             except Exception as e:
@@ -596,10 +597,18 @@ class MainWindow(QMainWindow):
         self.productGenreLineEditAddProductTab.clear()
         self.productDeveloperLineEditAddProductTab.clear()
         self.productPriceLineEditAddProductTab.clear()
-##########################################################################################################################
-
 
     def manageInventoryWidgetSetup(self):
+        """
+        This function sets up the inventory management widget by initializing various UI components, connecting their
+        signals to their respective handlers, and populating dropdowns with products and vendors.
+
+        Parameters:
+        self (object): The object of the inventory management widget.
+
+        Returns:
+        None
+        """
         self.productNameComboBoxEditInventoryTab = self.findChild(QComboBox, 'productNameComboBoxEditInventoryTab')
         self.newProductNameLineEditManageInventoryTab = self.findChild(QLineEdit, 'newProductNameLineEditManageInventoryTab')
         self.newProductGenreLineEditManageInventoryTab = self.findChild(QLineEdit, 'newProductGenreLineEditManageInventoryTab')
@@ -622,6 +631,16 @@ class MainWindow(QMainWindow):
         self.newVendorNameComboBoxManageInventoryTab.currentIndexChanged.connect(self.newVendorNameComboBoxManageInventoryTabCurrentIndexHandler)
 
     def productNameComboBoxEditInventoryTabCurrentIndexHandler(self):
+        """
+            This function handles the currentIndexChanged signal of the productNameComboBoxEditInventoryTab
+            combo box. It updates the UI components based on the selected product.
+
+            Parameters:
+            self (object): The object of the inventory management widget.
+
+            Returns:
+            None
+            """
         try:
             row = self.productNameComboBoxEditInventoryTab.currentData()
             self.productIdLineEditManageInventoryTab.setText(str(row[0]))
@@ -634,6 +653,16 @@ class MainWindow(QMainWindow):
             print(e)
 
     def newVendorNameComboBoxManageInventoryTabCurrentIndexHandler(self):
+        """
+        This function handles the currentIndexChanged signal of the newVendorNameComboBoxManageInventoryTab
+        combo box. It updates the UI components based on the selected vendor.
+
+        Parameters:
+        self (object): The object of the inventory management widget.
+
+        Returns:
+        None
+        """
         try:
             vendorId = self.newVendorNameComboBoxManageInventoryTab.currentData()[0]
             self.vendorIdLineEditManageInventoryTab.setText(str(vendorId))
@@ -641,6 +670,16 @@ class MainWindow(QMainWindow):
             print(e)
 
     def saveChangesButtonManageInventoryTabClickHandler(self):
+        """
+         This function handles the clicked signal of the saveChangesButtonManageInventoryTab button. It saves the
+         changes made to the selected product and updates the UI components.
+
+         Parameters:
+         self (object): The object of the inventory management widget.
+
+         Returns:
+         None
+         """
         prod_id = self.productIdLineEditManageInventoryTab.text()
         name = self.newProductNameLineEditManageInventoryTab.text()
         genre = self.newProductGenreLineEditManageInventoryTab.text()
@@ -654,12 +693,31 @@ class MainWindow(QMainWindow):
         self.refreshProducts()
 
     def addVendorWidgetSetup(self):
+        """
+           This function sets up the add vendor widget UI components and connects the relevant signal handlers.
+
+           Parameters:
+           self (object): The object of the inventory management widget.
+
+           Returns:
+           None
+           """
         self.vendorNameLineEditAddVendorTab = self.findChild(QLineEdit, 'vendorNameLineEditAddVendorTab')
         self.addVendorButtonAddVendorTab = self.findChild(QPushButton, 'addVendorButtonAddVendorTab')
         self.addVendorButtonAddVendorTab.clicked.connect(self.addVendorButtonAddVendorTabClickHandler)
         self.feedbackLabelAddVendorTab = self.findChild(QLabel, 'feedbackLabelAddVendorTab')
 
     def addVendorButtonAddVendorTabClickHandler(self):
+        """
+           This function is the click handler for the add vendor button. It adds a new vendor to the database and
+           refreshes the vendor list.
+
+           Parameters:
+           self (object): The object of the inventory management widget.
+
+           Returns:
+           None
+           """
         try:
             vendor_name = self.vendorNameLineEditAddVendorTab.text()
             assert vendor_name != '', 'Name cannot be empty'
@@ -671,6 +729,17 @@ class MainWindow(QMainWindow):
             self.feedbackLabelAddVendorTab.setText(e)
 
     def editVendorWidgetSetup(self):
+        """
+          This function sets up the vendor editing widget by retrieving the necessary UI elements and connecting them to their
+          corresponding handlers. It populates the vendor name combo box with data from the getAllVendors function and connects
+          the currentIndexChanged signal of the combo box to its corresponding handler.
+
+          Parameters:
+          - self: the object instance that the function belongs to.
+
+          Returns:
+          - None
+          """
         self.vendorNameComboBoxEditVendorTab = self.findChild(QComboBox, 'vendorNameComboBoxEditVendorTab')
         self.newVendorNameLineEditEditVendorTab = self.findChild(QLineEdit, 'newVendorNameLineEditEditVendorTab')
         self.vendorIdLineEditEditVendorTab = self.findChild(QLineEdit, 'vendorIdLineEditEditVendorTab')
@@ -684,6 +753,17 @@ class MainWindow(QMainWindow):
             self.vendorNameComboBoxEditVendorTabCurrentIndexChangedHandler)
 
     def vendorNameComboBoxEditVendorTabCurrentIndexChangedHandler(self):
+        """
+           This function is the handler for the currentIndexChanged signal of the vendorNameComboBoxEditVendorTab combo box.
+           It retrieves the vendor ID from the selected item in the combo box and populates the vendorIdLineEditEditVendorTab
+           line edit with the corresponding vendor ID.
+
+           Parameters:
+           - self: the object instance that the function belongs to.
+
+           Returns:
+           - None
+           """
         try:
             vendorId = self.vendorNameComboBoxEditVendorTab.currentData()[0]
             self.vendorIdLineEditEditVendorTab.setText(str(vendorId))
@@ -691,6 +771,18 @@ class MainWindow(QMainWindow):
             print(e)
 
     def saveChangesButtonEditVendorTabClickHandler(self):
+        """
+           This function is the handler for the clicked signal of the saveChangesButtonEditVendorTab push button.
+           It retrieves the new vendor name and vendor ID from the UI, calls the updateVendor function with the
+           vendor ID and new name as parameters to update the vendor in the database and calls the refreshVendors
+           function to update the vendor list in the UI.
+
+           Parameters:
+           - self: the object instance that the function belongs to.
+
+           Returns:
+           - None
+           """
         vendor_name = self.newVendorNameLineEditEditVendorTab.text()
         vendor_id = int(self.vendorIdLineEditEditVendorTab.text())
         updateVendor(vendor_id, vendor_name)
@@ -698,25 +790,43 @@ class MainWindow(QMainWindow):
         self.refreshVendors()
 
     def refreshVendors(self):
+        """
+            This function refreshes the vendor combo box in the UI by clearing their contents and repopulating them
+            with data from the getAllVendors function. It connects the currentIndexChanged signal of the newVendorNameComboBoxManageInventoryTab
+            and vendorNameComboBoxAddProductTab combo boxes to their corresponding handlers.
+
+            Parameters:
+            - self: the object instance that the function belongs to.
+
+            Returns:
+            - None
+            """
         self.newVendorNameLineEditEditVendorTab.clear()
         self.vendorIdLineEditEditVendorTab.clear()
         self.vendorNameComboBoxEditVendorTab.clear()
         self.vendorNameComboBoxAddProductTab.clear()
         self.newVendorNameComboBoxManageInventoryTab.clear()
-        vendors = getAllVendors()
-        for row in vendors:
-            self.vendorNameComboBoxEditVendorTab.addItem(str(row[1]), userData=[row[0], row[1]])
-        vendors = getAllVendors()
-        for row in vendors:
-            self.newVendorNameComboBoxManageInventoryTab.addItem(str(row[1]), userData=[row[0], row[1]])
         self.newVendorNameComboBoxManageInventoryTab.currentIndexChanged.connect(self.newVendorNameComboBoxManageInventoryTabCurrentIndexHandler)
         vendors = getAllVendors()
         for row in vendors:
+            self.newVendorNameComboBoxManageInventoryTab.addItem(str(row[1]), userData=[row[0], row[1]])
+            self.vendorNameComboBoxEditVendorTab.addItem(str(row[1]), userData=[row[0], row[1]])
             self.vendorNameComboBoxAddProductTab.addItem(row[1], userData=[row[0]])
         self.vendorNameComboBoxAddProductTab.currentIndexChanged.connect(
             self.vendorNameComboBoxAddProductTabCurrentIndexChangedHandler)
 
     def refreshProducts(self):
+        """
+            This function refreshes the product combo box in the UI by clearing their contents and repopulating them
+            with data from the getProducts function. It connects the currentIndexChanged signal of the productNameComboBoxEditInventoryTab
+            combo box to its corresponding handler.
+
+            Parameters:
+            - self: the object instance that the function belongs to.
+
+            Returns:
+            - None
+            """
         self.productNameComboBoxEditInventoryTab.clear()
         self.productComboBoxNewInvoiceTab.clear()
         products = getProducts()
@@ -729,6 +839,17 @@ class MainWindow(QMainWindow):
             self.productNameComboBoxEditInventoryTabCurrentIndexHandler)
 
     def shipmentWidgetSetup(self):
+        """
+            This function sets up the shipment widget in the UI by finding and storing the widgets, connecting their
+            clicked signals to their corresponding handlers, and populating the productComboBoxShipmentsTab with data
+            from the getProducts function. It also initializes the dictionary shipmentList.
+
+            Parameters:
+            - self: the object instance that the function belongs to.
+
+            Returns:
+            - None
+            """
         self.productComboBoxShipmentsTab = self.findChild(QComboBox, 'productComboBoxShipmentsTab')
         self.productSpinBoxShipmentsTab = self.findChild(QSpinBox, 'productSpinBoxShipmentsTab')
         self.addProductButtonShipmentsTab = self.findChild(QPushButton, 'addProductButtonShipmentsTab')
@@ -747,6 +868,17 @@ class MainWindow(QMainWindow):
         self.shipmentList = {}
 
     def addProductButtonShipmentsTabClickHandler(self):
+        """
+           This function is the handler for the clicked signal of the addProductButtonShipmentsTab push button.
+           It retrieves the new product info from the UI and calls the addProduct function to add it to the database.
+
+
+           Parameters:
+           - self: the object instance that the function belongs to.
+
+           Returns:
+           - None
+           """
         try:
             prodName = self.productComboBoxShipmentsTab.currentText()
             prodID = self.productComboBoxShipmentsTab.currentData()[0]
@@ -760,6 +892,14 @@ class MainWindow(QMainWindow):
             self.feedbackLabelNewInvoiceTab.setText(e)
 
     def removeProductButtonShipmentsTabClickHandler(self):
+        """
+            This function is the handler for the button for the removeProductButtonShipmentsTab, it removes a product
+            from the shipment list and updates the display on the shipments tab.
+
+            Parameters: self: An instance of the class that this method belongs to.
+
+            Returns: None.
+            """
         try:
             prodID = self.productComboBoxShipmentsTab.currentData()[0]
             amount = self.productSpinBoxShipmentsTab.value()
@@ -772,6 +912,13 @@ class MainWindow(QMainWindow):
             self.feedbackLabelNewInvoiceTab.setText(e)
 
     def displayShipmentList(self):
+        """
+            Updates the shipment list table widget on the shipments tab with the current contents of the shipment list.
+
+            Parameters: self: An instance of the class that this method belongs to.
+
+            Returns: None.
+            """
         try:
             self.feedbackLabelShipmentsTab.clear()
             columns = ["Product ID", "Product Name", "Quantity"]
@@ -792,6 +939,13 @@ class MainWindow(QMainWindow):
             print(e)
 
     def submitButtonShipmentsTabClickHandler(self):
+        """
+            Handles the submission of the shipment list by adjusting the stock levels of the associated products and updating the display on the shipments tab.
+
+            Parameters: self: An instance of the class that this method belongs to.
+
+            Returns: None
+            """
         try:
             for productID, productInfo in self.shipmentList.items():
                 adjustStock(productID, productInfo[1])
@@ -803,6 +957,14 @@ class MainWindow(QMainWindow):
             print(e)
 
     def randomShipmentButtonShipmentsTabClickHandler(self):
+        """
+            Generates a random shipment list and updates the display on the shipments tab and the product tables.
+
+            Parameters:
+                self: An instance of the class that this method belongs to.
+
+            Returns: None
+            """
         try:
             product_list = getProducts()
             attempts = randint(1, len(product_list)*randint(1, 2))
@@ -818,16 +980,41 @@ class MainWindow(QMainWindow):
             print(e)
 
     def viewWidgetSetup(self):
+        """
+           Sets up the view selection combo box and table widget in the view tab and populates the table with all inventory data.
+
+           Parameters:
+               self: An instance of the class that this method belongs to.
+
+           Returns: None
+           """
         self.viewSelectionComboBoxViewTab = self.findChild(QComboBox, 'viewSelectionComboBoxViewTab')
         self.viewTableWidgetViewTab = self.findChild(QTableWidget, 'viewTableWidgetViewTab')
         self.viewResetToDefault()
         self.viewSelectionComboBoxViewTab.currentIndexChanged.connect(self.viewSelectionComboBoxViewTabCurrentIndexChangedHandler)
 
     def viewResetToDefault(self):
+        """
+            Resets the view table to the default view by retrieving all inventory data and displaying it in the table.
+
+            Parameters:
+                self: An instance of the class that this method belongs to.
+
+            Returns: None
+            """
         colNames, data = getAllInventory()
         self.displayInView(colNames, data)
 
     def viewSelectionComboBoxViewTabCurrentIndexChangedHandler(self):
+        """
+            Handles the current index change event of the view selection combo box by updating the view table with the
+            selected data.
+
+            Parameters:
+                self: An instance of the class that this method belongs to.
+
+            Returns: None
+            """
         self.viewTableWidgetViewTab.clear()
         currently = self.viewSelectionComboBoxViewTab.currentText()
         if currently == 'Inventory':
@@ -843,10 +1030,27 @@ class MainWindow(QMainWindow):
         self.displayInView(colNames, data)
 
     def refreshProductTables(self):
+        """
+            Clears the contents of the viewTableWidgetViewTab widget.
+            Calls viewResetToDefault.
+
+            Parameters:
+                self: An instance of the class that this method belongs to.
+
+            Returns: None
+            """
         self.viewTableWidgetViewTab.clear()
         self.viewResetToDefault()
 
     def displayInView(self, columns, rows):
+        """
+            Displays the specified data in the viewTableWidgetViewTab widget.
+
+            Parameters:
+                    self: An instance of the class that this method belongs to.
+
+            Returns: None
+            """
         try:
             self.viewTableWidgetViewTab.setRowCount(len(rows))
             self.viewTableWidgetViewTab.setColumnCount(len(columns))
