@@ -360,7 +360,7 @@ class MainWindow(QMainWindow):
         self.currentInventoryLineEditManageInventoryTab = self.findChild(QLineEdit, 'currentInventoryLineEditManageInventoryTab')
         self.saveChangesButtonManageInventoryTab = self.findChild(QPushButton, 'saveChangesButtonManageInventoryTab')
         self.saveChangesButtonManageInventoryTab.clicked.connect(self.saveChangesButtonManageInventoryTabClickHandler)
-        products = getProductss()
+        products = getProducts()
         for row in products:
             self.productNameComboBoxEditInventoryTab.addItem(str(row[1]), userData=[row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]])
         self.productNameComboBoxEditInventoryTab.currentIndexChanged.connect(self.productNameComboBoxEditInventoryTabCurrentIndexHandler)
@@ -465,7 +465,7 @@ class MainWindow(QMainWindow):
         games = getProducts()
         for game in games:
             self.productComboBoxNewInvoiceTab.addItem(str(game[1]))
-        products = getProductss()
+        products = getProducts()
         for row in products:
             self.productNameComboBoxEditInventoryTab.addItem(str(row[1]),
                                                              userData=[row[0], row[1], row[2], row[3], row[4], row[5],
@@ -486,7 +486,7 @@ class MainWindow(QMainWindow):
         self.randomShipmentButtonShipmentsTab.clicked.connect(self.randomShipmentButtonShipmentsTabClickHandler)
         self.shipmentListTableWidgetShipmentsTab = self.findChild(QTableWidget, 'shipmentListTableWidgetShipmentsTab')
         self.feedbackLabelShipmentsTab = self.findChild(QLabel, 'feedbackLabelShipmentsTab')
-        games = getProductss()
+        games = getProducts()
         for row in games:
             self.productComboBoxShipmentsTab.addItem(row[1], userData=[row[0], row[2]])
         self.shipmentList = {}
@@ -546,7 +546,7 @@ class MainWindow(QMainWindow):
 
     def randomShipmentButtonShipmentsTabClickHandler(self):
         try:
-            product_list = getProductss()
+            product_list = getProducts()
             attempts = randint(1, len(product_list)*randint(1, 2))
             for products in range(attempts):
                 list_id = randint(0, len(product_list)-1)
