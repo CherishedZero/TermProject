@@ -1,4 +1,4 @@
-from SQLConnector import *
+from sqlConnector import *
 
 def getCustomerNames():
     sql = f"CALL store.customer_info_invoice;"
@@ -37,8 +37,16 @@ def getCustById(id):
     else:
         return data
 
+def customerHasAddress(custID):
+    sql = f"Call store.customer_has_address_by_id({custID})"
+    return bool(ExecuteAndReturn(sql)[1])
+
 def updateCustomerInfo(id, email, address, phone, fname, lname):
     sql = f"CALL store.update_customer_address_true({id},'{fname}','{lname}','{email}','{address}','{phone}');"
+    ExecuteAndCommit(sql)
+
+def updateCustomerInfoRemoveAddress(id, email, phone, fname, lname):
+    sql = f"CALL store.update_customer_address_true({id},'{fname}','{lname}','{email}', NULL,'{phone}');"
     ExecuteAndCommit(sql)
 
 def updateCustomerInfoBlankAddress(id, email, phone, fname, lname):
@@ -62,8 +70,6 @@ def checkStock(prodId):
     sql = f"CALL `store`.`current_stock_by_id`({prodId})"
     info = ExecuteAndReturn(sql)
     return(info[1])
-
-checkStock(3)
 
 def addProduct(prod_name, genre, dev, release, price, vendor_id):
     sql = f"CALL store.add_product('{prod_name}', '{genre}', '{dev}', '{release}', {price}, 0, {vendor_id});"

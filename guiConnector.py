@@ -1,4 +1,4 @@
-from sqltesting import *
+from pythonController import *
 import sys
 from random import randint
 
@@ -437,7 +437,10 @@ class MainWindow(QMainWindow):
                 self.editCustomerClear()
                 self.invoiceCustomerClear()
             else:
-                updateCustomerInfoBlankAddress(id, email, phone, fname, lname)
+                if customerHasAddress(id):
+                    updateCustomerInfoRemoveAddress(id, email, phone, fname, lname)
+                else:
+                    updateCustomerInfoBlankAddress(id, email, phone, fname, lname)
                 self.editCustomerClear()
                 self.invoiceCustomerClear()
             self.refreshCustomersComboBoxes()
