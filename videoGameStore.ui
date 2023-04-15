@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="posWidget">
      <attribute name="title">
@@ -689,7 +689,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="addProductTab">
        <attribute name="title">
@@ -1184,8 +1184,11 @@
          <property name="cursor">
           <cursorShape>UpArrowCursor</cursorShape>
          </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
          <property name="displayIntegerBase">
-          <number>11</number>
+          <number>10</number>
          </property>
         </widget>
         <widget class="QLabel" name="feedbackLabelManageInventoryTab">
@@ -1667,7 +1670,7 @@
      <x>0</x>
      <y>0</y>
      <width>785</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
