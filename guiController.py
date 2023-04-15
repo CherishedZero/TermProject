@@ -147,7 +147,8 @@ class MainWindow(QMainWindow):
                         cellData = QTableWidgetItem(str(self.invoiceList[key][1]))
                         self.invoiceListTableWidgetNewInvoiceTab.setItem(numRow, numColumn, cellData)
                     else:
-                        cellData = QTableWidgetItem(str(float(self.invoiceList[key][2]) * float(self.invoiceList[key][1])))
+                        line_total = float(self.invoiceList[key][2]) * float(self.invoiceList[key][1])
+                        cellData = QTableWidgetItem("{:.2f}".format(line_total))
                         self.invoiceListTableWidgetNewInvoiceTab.setItem(numRow, numColumn, cellData)
                         self.getTotal()
         except Exception as e:
@@ -175,6 +176,7 @@ class MainWindow(QMainWindow):
                 if self.invoiceList[prodID][1] <= 0:
                     del self.invoiceList[prodID]
             self.displayGameInfoInTable()
+            self.getTotal()
         except Exception as e:
             self.feedbackLabelNewInvoiceTab.setText(e)
 
@@ -545,7 +547,7 @@ class MainWindow(QMainWindow):
         self.productDeveloperLineEditAddProductTab = self.findChild(QLineEdit, 'productDeveloperLineEditAddProductTab')
         self.productReleaseDateAddProductTab = self.findChild(QDateEdit, 'productReleaseDateAddProductTab')
         self.productPriceLineEditAddProductTab = self.findChild(QLineEdit, 'productPriceLineEditAddProductTab')
-        self.startingInventorySpinBoxAddProductTab = self.findChild(QSpinBox, 'startingInventorySpinBoxAddProductTab')
+        self.startingInventorySpinBoxAddproductTab = self.findChild(QSpinBox, 'startingInventorySpinBoxAddproductTab')
         self.vendorNameComboBoxAddProductTab = self.findChild(QComboBox, 'vendorNameComboBoxAddProductTab')
         self.vendorIdLineEditAddProductTab = self.findChild(QLineEdit, 'vendorIdLineEditAddProductTab')
         self.feedbackLabelAddProductTab = self.findChild(QLabel, 'feedbackLabelAddProductTab')
@@ -588,7 +590,7 @@ class MainWindow(QMainWindow):
             genre = self.productGenreLineEditAddProductTab.text()
             dev = self.productDeveloperLineEditAddProductTab.text()
             release = self.productReleaseDateAddProductTab.date().toString('yyyy-MM-dd')
-            inventory = self.startingInventorySpinBoxAddProductTab.text()
+            inventory = self.startingInventorySpinBoxAddproductTab.text()
             try:
                 price = self.productPriceLineEditAddProductTab.text()
                 price_float = float(price)
