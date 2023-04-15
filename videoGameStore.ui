@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>869</width>
-    <height>732</height>
+    <width>753</width>
+    <height>529</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,12 +19,12 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>801</width>
-      <height>571</height>
+      <width>771</width>
+      <height>551</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="posWidget">
      <attribute name="title">
@@ -35,8 +35,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>800</width>
-        <height>525</height>
+        <width>761</width>
+        <height>481</height>
        </rect>
       </property>
       <property name="autoFillBackground">
@@ -54,8 +54,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>800</width>
-          <height>525</height>
+          <width>751</width>
+          <height>451</height>
          </rect>
         </property>
         <property name="title">
@@ -193,6 +193,9 @@
            <height>20</height>
           </rect>
          </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
         </widget>
         <widget class="QPushButton" name="addProductButtonNewInvoiceTab">
          <property name="geometry">
@@ -223,9 +226,9 @@
         <widget class="QTableWidget" name="invoiceListTableWidgetNewInvoiceTab">
          <property name="geometry">
           <rect>
-           <x>329</x>
+           <x>319</x>
            <y>20</y>
-           <width>471</width>
+           <width>421</width>
            <height>400</height>
           </rect>
          </property>
@@ -233,8 +236,8 @@
         <widget class="QLabel" name="label_11">
          <property name="geometry">
           <rect>
-           <x>310</x>
-           <y>460</y>
+           <x>320</x>
+           <y>420</y>
            <width>70</width>
            <height>20</height>
           </rect>
@@ -250,8 +253,8 @@
          <property name="geometry">
           <rect>
            <x>390</x>
-           <y>460</y>
-           <width>390</width>
+           <y>420</y>
+           <width>351</width>
            <height>20</height>
           </rect>
          </property>
@@ -689,7 +692,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="addProductTab">
        <attribute name="title">
@@ -1028,7 +1031,7 @@
          <property name="geometry">
           <rect>
            <x>140</x>
-           <y>440</y>
+           <y>420</y>
            <width>261</width>
            <height>21</height>
           </rect>
@@ -1543,6 +1546,9 @@
            <height>20</height>
           </rect>
          </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
         </widget>
         <widget class="QPushButton" name="addProductButtonShipmentsTab">
          <property name="geometry">
@@ -1575,7 +1581,7 @@
           <rect>
            <x>390</x>
            <y>30</y>
-           <width>400</width>
+           <width>351</width>
            <height>400</height>
           </rect>
          </property>
@@ -1644,7 +1650,7 @@
         <rect>
          <x>100</x>
          <y>40</y>
-         <width>671</width>
+         <width>641</width>
          <height>22</height>
         </rect>
        </property>
@@ -1687,8 +1693,8 @@
         <rect>
          <x>20</x>
          <y>70</y>
-         <width>751</width>
-         <height>461</height>
+         <width>721</width>
+         <height>391</height>
         </rect>
        </property>
       </widget>
@@ -1701,8 +1707,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>869</width>
-     <height>22</height>
+     <width>753</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
