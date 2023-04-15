@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="posWidget">
      <attribute name="title">
@@ -43,7 +43,7 @@
        <bool>false</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="newInvoiceTab">
        <attribute name="title">
@@ -265,10 +265,10 @@
         <widget class="QLabel" name="feedbackLabelNewInvoiceTab">
          <property name="geometry">
           <rect>
-           <x>90</x>
+           <x>30</x>
            <y>310</y>
            <width>260</width>
-           <height>20</height>
+           <height>41</height>
           </rect>
          </property>
          <property name="text">
@@ -935,23 +935,14 @@
           <string>Inventory</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="startingInventoryLineEditAddProductTab">
+        <widget class="QSpinBox" name="startingInventorySpinBoxAddproductTab">
          <property name="geometry">
           <rect>
            <x>120</x>
            <y>310</y>
            <width>261</width>
-           <height>20</height>
+           <height>22</height>
           </rect>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::TabFocus</enum>
-         </property>
-         <property name="maxLength">
-          <number>32764</number>
-         </property>
-         <property name="placeholderText">
-          <string/>
          </property>
         </widget>
        </widget>
