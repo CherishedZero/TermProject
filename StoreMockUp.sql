@@ -146,7 +146,7 @@ BEGIN
 END
 //
 
--- Creating Stored Procedures for Views
+-- Creating Stored Procedures for Reading Data
 DELIMITER //
 CREATE PROCEDURE `customer_list` ()
 BEGIN
@@ -175,6 +175,12 @@ DELIMITER //
 CREATE PROCEDURE `out_of_stock` ()
 BEGIN
 	SELECT p.prod_id AS 'ID', p.prod_name AS 'Product Name', p.genre AS 'Genre', p.developer AS 'Developer', p.release_date AS 'Date of Release', p.price AS 'Price', p.inventory AS 'Stock', v.vendor_name AS 'Publisher' FROM products AS p JOIN vendors AS v USING(vendor_id) WHERE inventory = 0;
+END
+//
+DELIMITER //
+CREATE PROCEDURE `current_stock_by_id` (given_id INT)
+BEGIN
+	SELECT inventory FROM products WHERE prod_id = given_id;
 END
 //
 
