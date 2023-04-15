@@ -189,6 +189,18 @@ BEGIN
 	SELECT MAX(invoice_id) FROM invoices;
 END
 //
+DELIMITER //
+CREATE PROCEDURE `customer_has_address_by_id` (given_id INT)
+BEGIN
+	DECLARE address VARCHAR(100);
+	SELECT address INTO address FROM customers WHERE customer_id = given_id;
+    IF address IS NOT NULL THEN
+		SELECT TRUE;
+	ELSE
+		SELECT FALSE;
+	END IF;
+END
+//
 
 -- Creating Stored Procedures for Inserting to Tables
 DELIMITER //
