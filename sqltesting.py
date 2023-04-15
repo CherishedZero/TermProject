@@ -5,32 +5,11 @@ def getCustomerNames():
     rows = ExecuteAndReturn(sql)[1]
     return rows
 
-# Phase out following 2 functions
-def getGameInfoByName(name):
-    sql = f"SELECT prod_id, prod_name, price FROM store.products WHERE prod_name = '{name}';"
-    try:
-        result_set = ExecuteAndReturn(sql)[1]
-        if result_set is None or len(result_set) == 0:
-            return None
-        gameInfo = result_set[0]
-        data = {'prod_id': gameInfo[0], 'prod_name': gameInfo[1], 'price': float(gameInfo[2])}
-        return ['ID', 'Game', 'Quantity', 'Price($)'], data
-    except Exception as e:
-        print(e)
-        return None
-
-def getCustByName(name):
-    sql = f"SELECT email, customer_id FROM store.customers WHERE '{name}' = CONCAT(first_name, ' ', last_name);"
-    try:
-        result_set = ExecuteAndReturn(sql)[1]
-        if result_set is None or len(result_set) == 0:
-            return None
-        custInfo = result_set[0]
-        data = {'email': custInfo[0], 'customer_id': custInfo[1]}
-    except Exception as e:
-        print(e)
-    else:
-        return data
+def getProducts():
+    sql = f"CALL `store`.`product_list`();"
+    rows = ExecuteAndReturn(sql)[1]
+    names = [row[0:2]+row[5:6] for row in rows]
+    return names
 
 def addCustomer(fname, lname, email, address, phone):
     sql = f"CALL store.add_customer_with_address('{fname}','{lname}','{email}','{address}','{phone}');"
@@ -67,24 +46,24 @@ def updateCustomerInfoBlankAddress(id, email, phone, fname, lname):
     ExecuteAndCommit(sql)
 
 
-# Following function needs a rewrite
-def createInvoice(custId, prodId, quantity):
-    sql1 = f"CALL store.create_invoice({custId});"
+def createInvoice(cust_id, invoice):
+    sql1 = f"CALL `store`.`create_invoice`({cust_id});"
     ExecuteAndCommit(sql1)
-    sql2 = f"SELECT MAX(invoice_id) FROM `store`.`invoices`;"
+    sql2 = f"CALL `store`.`latest_invoice`;"
     rows = list(ExecuteAndReturn(sql2))
     invoice_id = rows[1][0]
-    sql3 = f"CALL `store`.`add_invoice_product`({invoice_id[0]}, {prodId}, {quantity});"
-    ExecuteAndCommit(sql3)
-    sql4 = f"UPDATE `store`.`products` SET inventory = inventory - {quantity} WHERE prod_id = {prodId};"
-    ExecuteAndCommit(sql4)
+    for key, value in invoice.items():
+        sql3 = f"CALL `store`.`add_invoice_product`({invoice_id[0]}, {key}, {value[1]});"
+        ExecuteAndCommit(sql3)
+        sql4 = f"CALL `store`.`adjust_stock`({key}, -{value[1]});"
+        ExecuteAndCommit(sql4)
 
-def checkStock(prodId, purQuantity):
-    sql = f"CALL store.current_stock_by_id({prodId})"
-    curStock = ExecuteAndReturn(sql)
-    if purQuantity > curStock:
-        return False
-    return True
+def checkStock(prodId):
+    sql = f"CALL `store`.`current_stock_by_id`({prodId})"
+    info = ExecuteAndReturn(sql)
+    return(info[1])
+
+checkStock(3)
 
 def addProduct(prod_name, genre, dev, release, price, vendor_id):
     sql = f"CALL store.add_product('{prod_name}', '{genre}', '{dev}', '{release}', {price}, 0, {vendor_id});"
@@ -125,8 +104,12 @@ def getRecentCustomers():
     return ExecuteAndReturn(sql)
 
 def getProducts():
-    sql = f"CALL store.prod_full_info;"
+    sql = f"CALL `store`.`prod_full_info`();"
     return ExecuteAndReturn(sql)[1]
+
+def updateProduct(prod_id, name, genre, dev, date, price, stock, vendor):
+    sql_query = f"CALL store.update_product({prod_id}, '{name}', '{genre}', '{dev}', '{date}', {price}, {stock}, {vendor})"
+    ExecuteAndCommit(sql_query)
 
 def updateVendor(vendor_id, vendor_name):
     sql_query = f"CALL store.update_vendor({vendor_id}, '{vendor_name}');"
