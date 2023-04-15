@@ -4,7 +4,7 @@ import getSQLLogin
 
 def execute_and_commit(query):
     with mysql.connector.connect(host='localhost', user=getSQLLogin.user, password=getSQLLogin.password,
-                                 database='doctor') as mysql_connection:
+                                 database='store') as mysql_connection:
         with mysql_connection.cursor() as mysql_cursor:
             mysql_cursor.execute(query)
             mysql_connection.commit()
@@ -13,7 +13,7 @@ def execute_and_commit(query):
 
 def execute_and_return(query):
     with mysql.connector.connect(host='localhost', user=getSQLLogin.user, password=getSQLLogin.password,
-                                 database='doctor') as mysql_connection:
+                                 database='store') as mysql_connection:
         with mysql_connection.cursor() as mysql_cursor:
             mysql_cursor.execute(query)
             return mysql_cursor.column_names, mysql_cursor.fetchall()
