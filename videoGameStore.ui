@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="posWidget">
      <attribute name="title">
@@ -43,7 +43,7 @@
        <bool>false</bool>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="newInvoiceTab">
        <attribute name="title">
@@ -88,6 +88,9 @@
          </property>
         </widget>
         <widget class="QLineEdit" name="emailLineEditNewInvoiceTab">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="geometry">
           <rect>
            <x>90</x>
@@ -107,6 +110,9 @@
          </property>
         </widget>
         <widget class="QLineEdit" name="idLineEditNewInvoiceTab">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="geometry">
           <rect>
            <x>90</x>
@@ -683,7 +689,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="addProductTab">
        <attribute name="title">
