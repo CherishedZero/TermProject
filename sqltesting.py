@@ -2,59 +2,32 @@ from SQLConnector import *
 
 def getCustomerNames():
     sql = f"CALL `store`.`customer_info_invoice`();"
-    rows = executeQueryAndReturnResult(sql)[1]
+    rows = execute_and_return(sql)[1]
     return rows
-print(getCustomerNames())
 
 def getProducts():
     sql = f"CALL `store`.`product_list`();"
-    rows = executeQueryAndReturnResult(sql)[1]
+    rows = execute_and_return(sql)[1]
     names = [row[0:2]+row[5:6] for row in rows]
     return names
 
-def getGameInfoByName(name):
-    sql = f"SELECT prod_id, prod_name, price FROM store.products WHERE prod_name = '{name}';"
-    try:
-        result_set = executeQueryAndReturnResult(sql)[1]
-        if result_set is None or len(result_set) == 0:
-            return None
-        gameInfo = result_set[0]
-        data = {'prod_id': gameInfo[0], 'prod_name': gameInfo[1], 'price': float(gameInfo[2])}
-        return ['ID', 'Game', 'Quantity', 'Price($)'], data
-    except Exception as e:
-        print(e)
-        return None
-
-def getCustByName(name):
-    sql = f"SELECT email, customer_id FROM store.customers WHERE '{name}' = CONCAT(first_name, ' ', last_name);"
-    try:
-        result_set = executeQueryAndReturnResult(sql)[1]
-        if result_set is None or len(result_set) == 0:
-            return None
-        custInfo = result_set[0]
-        data = {'email': custInfo[0], 'customer_id': custInfo[1]}
-    except Exception as e:
-        print(e)
-    else:
-        return data
-
 def addCustomer(fname, lname, email, address, phone):
     sql = f"CALL `store`.`add_customer_with_address`('{fname}','{lname}','{email}','{address}','{phone}');"
-    executeQueryAndCommit(sql)
+    execute_and_commit(sql)
 
 def addCustomerNoAddress(fname, lname, email, phone):
     sql = f"CALL `store`.`add_customer_without_address`('{fname}','{lname}','{email}','{phone}');"
-    executeQueryAndCommit(sql)
+    execute_and_commit(sql)
 
 def getCustomer():
     sql = f"CALL `store`.`customer_full_info`();"
-    rows = executeQueryAndReturnResult(sql)[1]
+    rows = execute_and_return(sql)[1]
     return rows
 
 def getCustById(id):
     sql = f"CALL `store`.`customer_full_info_by_id`([{id});"
     try:
-        result_set = executeQueryAndReturnResult(sql)[1]
+        result_set = execute_and_return(sql)[1]
         if result_set is None or len(result_set) == 0:
             return None
         custInfo = result_set[0]
@@ -66,69 +39,74 @@ def getCustById(id):
 
 def updateCustomerInfo(id, email, address, phone, fname, lname):
     sql = f"CALL `store`.`update_customer_address_true`({id},'{fname}','{lname}','{email}','{address}','{phone}');"
-    executeQueryAndCommit(sql)
+    execute_and_commit(sql)
 
 def updateCustomerInfoBlankAddress(id, email, phone, fname, lname):
     sql = f"CALL `store`.`update_customer_address_false`({id},'{fname}','{lname}','{email}','{phone}');"
-    executeQueryAndCommit(sql)
+    execute_and_commit(sql)
 
 
-def createInvoice(custId, prodId, quantity):
-    sql1 = f"CALL `store`.`create_invoice`({custId});"
-    executeQueryAndCommit(sql1)
-    sql2 = f"SELECT MAX(invoice_id) FROM `store`.`invoices`;"
-    rows = list(executeQueryAndReturnResult(sql2))
+def createInvoice(cust_id, invoice):
+    sql1 = f"CALL `store`.`create_invoice`({cust_id});"
+    execute_and_commit(sql1)
+    sql2 = f"CALL `store`.`latest_invoice`;"
+    rows = list(execute_and_return(sql2))
     invoice_id = rows[1][0]
-    sql3 = f"CALL `store`.`add_invoice_product`({invoice_id[0]}, {prodId}, {quantity});"
-    executeQueryAndCommit(sql3)
-    sql4 = f"CALL `store`.`adjust_stock`({prodId}, -{quantity});"
-    executeQueryAndCommit(sql4)
+    print(invoice_id)
+    for key, value in invoice.items():
+        sql3 = f"CALL `store`.`add_invoice_product`({invoice_id[0]}, {key}, {value[1]});"
+        print(sql3)
+        execute_and_commit(sql3)
+        sql4 = f"CALL `store`.`adjust_stock`({key}, -{value[1]});"
+        execute_and_commit(sql4)
 
 def checkStock(prodId):
-    sql = f"SELECT inventory FROM products WHERE prod_id = {prodId}"
-    info = executeQueryAndReturnResult(sql)
+    sql = f"CALL `store`.`current_stock_by_id`({prodId})"
+    info = execute_and_return(sql)
     return(info[1])
 
 checkStock(3)
 
 def addProduct(prod_name, genre, dev, release, price, vendor_id):
     sql = f"CALL `store`.`add_product`('{prod_name}', '{genre}', '{dev}', '{release}', {price}, 0, {vendor_id});"
-    executeQueryAndCommit(sql)
+    execute_and_commit(sql)
 
 def addVendor(name):
     sql = f"CALL `store`.`add_vendor`('{name}');"
-    executeQueryAndCommit(sql)
+    execute_and_commit(sql)
 
 def getAllInventory():
     sql = f"CALL `store`.`product_list`();"
-    return executeQueryAndReturnResult(sql)
+    return execute_and_return(sql)
 
 
 def outOfStock():
     sql = f"CALL `store`.`out_of_stock`();"
-    return executeQueryAndReturnResult(sql)
+    return execute_and_return(sql)
 
 def getAllVendors():
     sql = f"CALL `store`.`vendor_list`();"
-    print(executeQueryAndReturnResult(sql))
-    return executeQueryAndReturnResult(sql)[1]
+    return execute_and_return(sql)[1]
 
 def getAllVendorsForTable():
     sql = f"CALL `store`.`vendor_list`();"
-    print(executeQueryAndReturnResult(sql))
-    return executeQueryAndReturnResult(sql)
+    return execute_and_return(sql)
 
 def updateVendor(id, name):
     sql = f"CALL `store`.`update_vendor`({id},'{name}');"
-    executeQueryAndCommit(sql)
+    execute_and_commit(sql)
 
 
 def getAllCustomers():
     sql = f"CALL `store`.`customer_list`();"
-    return executeQueryAndReturnResult(sql)
+    return execute_and_return(sql)
 
 def getProductss():
     sql = f"CALL `store`.`prod_full_info`();"
-    return executeQueryAndReturnResult(sql)[1]
+    return execute_and_return(sql)[1]
+
+def updateProduct(prod_id, name, genre, dev, date, price, vendor, stock=100):
+    sql_query = f"CALL store.update_product({prod_id}, '{name}', '{genre}', '{dev}', '{date}', {price}, {stock}, {vendor})"
+    execute_and_commit(sql_query)
 
 
