@@ -2,7 +2,7 @@ import mysql.connector
 import getSQLLogin
 
 
-def execute_and_commit(query):
+def ExecuteAndCommit(query):
     with mysql.connector.connect(host='localhost', user=getSQLLogin.user, password=getSQLLogin.password,
                                  database='store') as mysql_connection:
         with mysql_connection.cursor() as mysql_cursor:
@@ -11,7 +11,7 @@ def execute_and_commit(query):
             return mysql_cursor.rowcount
 
 
-def execute_and_return(query):
+def ExecuteAndReturn(query):
     with mysql.connector.connect(host='localhost', user=getSQLLogin.user, password=getSQLLogin.password,
                                  database='store') as mysql_connection:
         with mysql_connection.cursor() as mysql_cursor:
