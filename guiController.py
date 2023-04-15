@@ -191,20 +191,14 @@ class MainWindow(QMainWindow):
             assert all(field != '' for field in [fname, lname, email, phone]), 'Only Address can be left empty'
             if address != '':
                 addCustomer(fname, lname, email, address, phone)
-                self.newInvoiceWidgetSetup()
-                self.editCustomerWidgetSetup()
-                self.clearAddCustomerFields()
-                self.editCustomerClear()
-                self.invoiceCustomerClear()
-                self.refreshCustomersComboBoxes()
             else:
                 addCustomerNoAddress(fname,lname, email, phone)
-                self.newInvoiceWidgetSetup()
-                self.editCustomerWidgetSetup()
-                self.clearAddCustomerFields()
-                self.editCustomerClear()
-                self.invoiceCustomerClear()
-                self.refreshCustomersComboBoxes()
+            self.newInvoiceWidgetSetup()
+            self.editCustomerWidgetSetup()
+            self.clearAddCustomerFields()
+            self.editCustomerClear()
+            self.invoiceCustomerClear()
+            self.refreshCustomersComboBoxes()
         except Exception as e:
             self.feedbackLabelAddCustomerTab.setText(str(e))
 
