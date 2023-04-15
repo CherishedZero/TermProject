@@ -83,3 +83,10 @@ def createInvoice(custId, prodId, quantity):
     execute_and_commit(sql3)
     sql4 = f"UPDATE `store`.`products` SET inventory = inventory - {quantity} WHERE prod_id = {prodId};"
     execute_and_commit(sql4)
+
+def checkStock(prodId, purQuantity):
+    sql = f"CALL store.current_stock_by_id({prodId})"
+    curStock = execute_and_return(sql)
+    if purQuantity > curStock:
+        return False
+    return True
