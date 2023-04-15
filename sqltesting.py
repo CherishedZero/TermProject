@@ -124,8 +124,23 @@ def getAllCustomers():
     sql = f"CALL `store`.`customer_list`();"
     return ExecuteAndReturn(sql)
 
+def getRecentCustomers():
+    sql = f"CALL store.recent_customers;"
+    return ExecuteAndReturn(sql)
+
 def getProductss():
     sql = f"CALL `store`.`prod_full_info`();"
     return ExecuteAndReturn(sql)[1]
 
+def updateVendor(vendor_id, vendor_name):
+    sql_query = f"CALL store.update_vendor({vendor_id}, '{vendor_name}');"
+    ExecuteAndCommit(sql_query)
 
+def adjustStock(product_id, quantity):
+    sql_query = f"CALL store.adjust_stock({product_id}, '{quantity}');"
+    ExecuteAndCommit(sql_query)
+
+
+def updateProduct(prod_id, name, genre, dev, date, price, stock, vendor):
+    sql_query = f"CALL store.update_product({prod_id}, '{name}', '{genre}', '{dev}', '{date}', {price}, {stock}, {vendor})"
+    ExecuteAndCommit(sql_query)
