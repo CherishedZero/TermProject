@@ -138,5 +138,5 @@ def adjustStock(product_id, quantity):
 
 
 def updateProduct(prod_id, name, genre, dev, date, price, stock, vendor):
-    sql_query = f"CALL store.update_product({prod_id}, '{name}', '{genre}', '{dev}', '{date}', {price}, {stock}, {vendor})"
+    sql_query = f'CALL store.update_product({prod_id}, "{name}", "{genre}", "{dev}", "{date}", {price}, {stock}, {vendor})'
     ExecuteAndCommit(sql_query)

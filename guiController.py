@@ -376,7 +376,6 @@ class MainWindow(QMainWindow):
             self.newProductNameLineEditManageInventoryTab.setText(row[1])
             self.newProductGenreLineEditManageInventoryTab.setText(row[2])
             self.newProductDeveloperLineEditManageInventoryTab.setText(row[3])
-            # self.newProductReleaseDateManageInventoryTab.setText(row[4])
             self.newProductPriceLineEditManageInventoryTab.setText(str(row[5]))
             self.currentInventoryLineEditManageInventoryTab.setText(str(row[6]))
         except Exception as e:
@@ -394,10 +393,12 @@ class MainWindow(QMainWindow):
         name = self.newProductNameLineEditManageInventoryTab.text()
         genre = self.newProductGenreLineEditManageInventoryTab.text()
         dev = self.newProductDeveloperLineEditManageInventoryTab.text()
-        date = self.newProductReleaseDateManageInventoryTab.text()
+        date = self.newProductReleaseDateManageInventoryTab.date()
+        release_date = f"{date.year()}-{date.month()}-{date.day()}"
         price = self.newProductPriceLineEditManageInventoryTab.text()
         vendor = self.vendorIdLineEditManageInventoryTab.text()
-        updateProduct(prod_id, name, genre, dev, date, price, vendor)
+        inventory = self.quantitySpinBoxManageInventoryTab.value()
+        updateProduct(prod_id, name, genre, dev, release_date, price, inventory, vendor)
         self.refreshProducts()
 
     def addVendorWidgetSetup(self):
@@ -518,6 +519,7 @@ class MainWindow(QMainWindow):
 
     def displayShipmentList(self):
         try:
+            self.feedbackLabelShipmentsTab.clear()
             columns = ["Product ID", "Product Name", "Quantity"]
             self.shipmentListTableWidgetShipmentsTab.setColumnCount(3)
             self.shipmentListTableWidgetShipmentsTab.setRowCount(len(self.shipmentList))
@@ -541,6 +543,8 @@ class MainWindow(QMainWindow):
                 adjustStock(productID, productInfo[1])
             self.shipmentList = {}
             self.displayShipmentList()
+            self.refreshProductTables()
+            self.feedbackLabelShipmentsTab.setText("Shipment Received!")
         except Exception as e:
             print(e)
 
@@ -556,16 +560,18 @@ class MainWindow(QMainWindow):
                 else:
                     self.shipmentList[product_id] = [product_list[list_id][1], randint(1, 200)]
             self.displayShipmentList()
-            self.refreshProductTables()
         except Exception as e:
             print(e)
 
     def viewWidgetSetup(self):
         self.viewSelectionComboBoxViewTab = self.findChild(QComboBox, 'viewSelectionComboBoxViewTab')
         self.viewTableWidgetViewTab = self.findChild(QTableWidget, 'viewTableWidgetViewTab')
+        self.viewResetToDefault()
+        self.viewSelectionComboBoxViewTab.currentIndexChanged.connect(self.viewSelectionComboBoxViewTabCurrentIndexChangedHandler)
+
+    def viewResetToDefault(self):
         colNames, data = getAllInventory()
         self.displayInView(colNames, data)
-        self.viewSelectionComboBoxViewTab.currentIndexChanged.connect(self.viewSelectionComboBoxViewTabCurrentIndexChangedHandler)
 
     def viewSelectionComboBoxViewTabCurrentIndexChangedHandler(self):
         self.viewTableWidgetViewTab.clear()
@@ -584,6 +590,7 @@ class MainWindow(QMainWindow):
 
     def refreshProductTables(self):
         self.viewTableWidgetViewTab.clear()
+        self.viewResetToDefault()
 
     def displayInView(self, columns, rows):
         try:

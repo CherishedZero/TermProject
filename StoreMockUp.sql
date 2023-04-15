@@ -183,6 +183,12 @@ BEGIN
 	SELECT inventory FROM products WHERE prod_id = given_id;
 END
 //
+DELIMITER //
+CREATE PROCEDURE `latest_invoice` ()
+BEGIN
+	SELECT MAX(invoice_id) FROM invoices;
+END
+//
 
 -- Creating Stored Procedures for Inserting to Tables
 DELIMITER //
